@@ -1,0 +1,41 @@
+default:
+  foo: bar
+  hello: world
+  number: 6
+  ary:
+    - 0
+    - 1
+    - 1
+    - 2
+    - 3
+    - 5
+    - 8
+    - 13
+    - 21
+  obj:
+    x: 1
+    'y': 2
+testenv1:
+  hello: mondo
+  obj:
+    z: 3
+  add: me
+testenv2:
+  ary:
+    - 2
+    - 4
+    - 8
+    - 16
+    - 32
+    - 64
+    - 128
+    - 256
+    - 512
+    - 1024
+  first: last
+hostnames:
+  testenv1:
+    - a--not-found
+  testenv2:
+    - '--not-found-2'
+    - !!js/regexp /\-\-still(.*?)notfound/
