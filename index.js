@@ -51,7 +51,7 @@ class SMConfig {
 	 * Environmental configuration values can always be overridden at runtime by
 	 * passing environmental variables to the application. To be considered,
 	 * environmental variables must start with a prefix, configured with the
-	 * `envVarPrefix` parameter (default: `APPSETTING_`) Environmental variables
+	 * `envVarPrefix` option (default: `APPSETTING_`) Environmental variables
 	 * are lowercased then converted to camelCase, for example
 	 * `APPSETTING_SECRET_KEY` becomes `secretKey`.
 	 * Values passed via environmental variables are strings, but numeric ones
@@ -67,10 +67,26 @@ class SMConfig {
 	 * 4. Fallback to the `default` environment
 	 * 
 	 * @param {Object|string} config - Configuration params or filename to load
-	 * @param {string} [env] - Optional set environment
-	 * @param {string} [envVarPrefix='APPSETTING_'] - Prefix for environmental variables
+	 * @param {string} [env] - Force a specific environment
+	 * @param {object} [options] - Advanced options
+	 * @param {string} [options.envVarPrefix='APPSETTING_'] - Prefix for environmental variables
+	 * @param {boolean} [options.flatten=true] - When true, configuration object is also flatened to "dot notation"
 	 */
-	constructor(config, env, envVarPrefix) {
+	constructor(config, env, options) {
+		// Ensure options is an object
+		if(options && !SMHelper.isPlainObject(options)) {
+			throw Error('The options parameter must be a dictionary')
+		}
+		else if(!options) {
+			options = {}
+		}
+
+		// Defaults for the options parameter
+		options = Object.assign({
+			envVarPrefix: 'APPSETTING_',
+			flatten: true
+		}, options)
+
 		// Ensure the config object is set
 		if(!config) {
 			throw Error('Parameter config must be set')
@@ -91,7 +107,9 @@ class SMConfig {
 		}
 
 		// Default value for envVarPrefix
-		envVarPrefix = envVarPrefix ? SMHelper.toStringSafe(envVarPrefix) : 'APPSETTING_'
+		options.envVarPrefix = options.envVarPrefix
+			? SMHelper.toStringSafe(options.envVarPrefix)
+			: 'APPSETTING_'
 
 		// Get the name of the current environment
 		this._environment = this._getEnvironment(env, configData.hostnames)
@@ -102,13 +120,22 @@ class SMConfig {
 			: {}
 
 		// Lastly, load configuration from environmental variables
-		let envVars = this._loadEnvironmentalVariables(envVarPrefix)
+		let envVars = this._loadEnvironmentalVariables(options.envVarPrefix)
 
 		// Merge all the configuration, in order of priority:
 		// 1. Runtime environmental variables
 		// 2. Environment config
 		// 3. Default config
-		this._config = Object.assign({}, configData.default, envConfig, envVars) 
+		// Store the result in the object
+		this._config = Object.assign({}, configData.default, envConfig, envVars)
+
+		// Flatten all nested objects to dot notation, if necessary
+		if(options.flatten) {
+			let flat = SMHelper.objectToDotNotation(this._config, true)
+
+			// Store in the object a merged dictionary, flattened and unflattened
+			this._config = Object.assign({}, flat, this._config)
+		}
 	}
 
 	/**
