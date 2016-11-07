@@ -30,11 +30,18 @@ const SMConfig = require('smconfig')
 
 The module exports a class named `SMConfig`.
 
-### Constructor: SMConfig(config, env, envVarPrefix)
+### Constructor: SMConfig(config, env, options)
 
 ````js
-let config = new SMConfig(config, env, envVarPrefix)
+let config = new SMConfig(config, env, options)
 ````
+
+Parameters:
+- `config`: configuration object (read below for description)
+- `env`: when set, forces a specific environment
+- `options`: dictionary with advanced options:
+    - `options.envVarPrefix`: prefix for environmental variables (default: `APPSETTING_`)
+    - `options.flatten`: when true, configuration object is also flatened to "dot notation" (default: true)
 
 The constructor determines the environment, then loads the configuration for the environment and stores it in the object.
 
@@ -99,7 +106,7 @@ When using YAML, you can also use the following types that are not supported by 
 - Functions: `!!js/function 'function () {...}'`
 - Undefined: `!!js/undefined ''`
 
-Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with environmental variables. These values are prefixed with **`envVarPrefix`**, which defaults to `APPSETTING_`; the prefix is then removed, the key is lowercased and converted to camelCase. For example:
+Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with environmental variables. These values are prefixed with **`options.envVarPrefix`**, which defaults to `APPSETTING_`; the prefix is then removed, the key is lowercased and converted to camelCase. For example:
 
 ````sh
 # SMConfig will store 'Passw0rd' for the 'databaseConfiguration' key
@@ -110,11 +117,50 @@ $ APPSETTING_DATABASE_PASSWORD=Passw0rd node myapp.js
 $ CUSTOMPREFIX_DATABASE_PASSWORD=Passw0rd node myapp.js
 ````
 
+When **`options.flatten`** is true, as per default value, the configuration data is also "flattened" into a dictionary that uses "dot notation". For example, imagine the following configuration:
+
+````js
+console.log(config.all)
+
+// Output when
+// options.flatten: false
+{
+    "database": {
+        "host": "db.example.com",
+        "username": "admin",
+        "password": "Passw0rd",
+        "ports": [8000, 8001]
+    },
+    "otherkey": "otherval"
+}
+
+// Output when
+// options.flatten: true
+{
+    "database": {
+        "host": "db.example.com",
+        "credentials": {
+            "username": "admin",
+            "password": "Passw0rd"
+        },
+        "ports": [8000, 8001]
+    },
+    "database.host": "db.example.com",
+    "database.credentials.username": "admin",
+    "database.credentials.password": "Passw0rd",
+    "database.ports": [8000, 8001],
+    "otherkey": "otherval"
+}
+````
+
 ### SMConfig.get(key)
 
 ````js
 // config is an instance of SMConfig
 let databasePassword = config.get('databasePassword')
+
+// If options.flatten is true, you can also access "nested" keys
+let nested = config.get('database.credentials.password')
 ````
 
 Returns the value for the key passed as argument, reading from the configuration for the environment.

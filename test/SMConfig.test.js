@@ -58,6 +58,18 @@ describe('SMConfig.js', () => {
         }
 
         // Expected configuration for testenv1 and testenv2
+        let defaultExpect = {
+            foo: 'bar',
+            hello: 'world',
+            number: 6,
+            ary: [0, 1, 1, 2, 3, 5, 8, 13, 21],
+            obj: {
+                x: 1,
+                y: 2
+            },
+            'obj.x': 1,
+            'obj.y': 2
+        }
         let testenv1Expect = {
             foo: 'bar',
             hello: 'mondo',
@@ -66,6 +78,7 @@ describe('SMConfig.js', () => {
             obj: {
                 z: 3
             },
+            'obj.z': 3,
             add: 'me'
         }
         let testenv2Expect = {
@@ -77,6 +90,8 @@ describe('SMConfig.js', () => {
                 x: 1,
                 y: 2
             },
+            'obj.x': 1,
+            'obj.y': 2,
             first: 'last'
         }
 
@@ -117,6 +132,13 @@ describe('SMConfig.js', () => {
             // All ok
             let config = new SMConfig({default: {}})
             assert.ok(config)
+        })
+
+        it('Options parameter', () => {
+            // Options parameter is not a dictionary
+            assert.throws(() => {
+                new SMConfig({default: {}}, 'default', 'invalid')
+            })
         })
 
         it('Environment: fallback to default', () => {
@@ -196,6 +218,11 @@ describe('SMConfig.js', () => {
 
         it('Configuration: load default configuration', () => {
             let config = new SMConfig(params, 'nonexisting')
+            assert.deepStrictEqual(config.all, defaultExpect)
+        })
+
+        it('Configuration: do not flatten configuration', () => {
+            let config = new SMConfig(params, 'nonexisting', {flatten: false})
             assert.deepStrictEqual(config.all, params.default)
         })
 
@@ -229,12 +256,12 @@ describe('SMConfig.js', () => {
             process.env.SET_FOO = 'overwrite-2' // Overwrite
             process.env.SET_SOME_FLOAT = '19.91' // camelCase
 
-            let expect = SMHelper.cloneObject(params.default)
+            let expect = SMHelper.cloneObject(defaultExpect)
             expect.when = 'runtime-again'
             expect.foo = 'overwrite-2'
             expect.someFloat = 19.91
 
-            let config = new SMConfig(params, 'default', 'SET_')
+            let config = new SMConfig(params, 'default', {envVarPrefix: 'SET_'})
             assert.deepStrictEqual(config.all, expect)
         })
 
@@ -252,19 +279,19 @@ describe('SMConfig.js', () => {
 
         it('Configuration: load from JSON file', () => {
             // Use another prefix for env vars so the ones set before are ignored
-            let config = new SMConfig('test/resources/testconfig.json', 'testenv2', 'NOTHING_')
+            let config = new SMConfig('test/resources/testconfig.json', 'testenv2', {envVarPrefix: 'NOTHING_'})
             assert.deepStrictEqual(config.all, testenv2Expect)
         })
 
         it('Configuration: load from YAML file', () => {
             // Use another prefix for env vars so the ones set before are ignored
-            let config = new SMConfig('test/resources/testconfig.yaml', 'testenv2', 'NOTHING_')
+            let config = new SMConfig('test/resources/testconfig.yaml', 'testenv2', {envVarPrefix: 'NOTHING_'})
             assert.deepStrictEqual(config.all, testenv2Expect)
         })
 
         it('Configuration: load from Hjson file', () => {
             // Use another prefix for env vars so the ones set before are ignored
-            let config = new SMConfig('test/resources/testconfig.hjson', 'testenv2', 'NOTHING_')
+            let config = new SMConfig('test/resources/testconfig.hjson', 'testenv2', {envVarPrefix: 'NOTHING_'})
             assert.deepStrictEqual(config.all, testenv2Expect)
         })
     })
@@ -284,7 +311,7 @@ describe('SMConfig.js', () => {
 
         it('SMConfig.all should return all configuration options', () => {
             // Use another prefix for env vars so the ones set before are ignored
-            let config = new SMConfig({default: {a: 1}, myenv: {b: 2}}, 'myenv', 'NOTHING_')
+            let config = new SMConfig({default: {a: 1}, myenv: {b: 2}}, 'myenv', {envVarPrefix: 'NOTHING_'})
             assert.deepStrictEqual(config.all, {a: 1, b: 2})
         })
 
@@ -297,7 +324,7 @@ describe('SMConfig.js', () => {
 
         it('SMConfig.get should return value for configuration key', () => {
             // Use another prefix for env vars so the ones set before are ignored
-            let config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar']}}, 'myenv', 'NOTHING_')
+            let config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar']}}, 'myenv', {envVarPrefix: 'NOTHING_'})
             assert.deepStrictEqual(config.get('a'), 1)
             assert.deepStrictEqual(config.get('b'), 'ale')
             assert.deepStrictEqual(config.get('foo'), ['bar'])
