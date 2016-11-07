@@ -7,7 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "./node_modules/mocha/bin/mocha ./test/*",
+    "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "jsdoc": "./node_modules/jsdoc/jsdoc.js -c .jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -29,7 +31,11 @@
     "smhelper": "1.0.x"
   },
   "devDependencies": {
+    "coveralls": "2.11.x",
+    "istanbul": "0.4.x",
+    "jsdoc": "3.4.x",
     "mocha": "3.1.x",
+    "mocha-lcov-reporter": "1.2.x",
     "should": "11.1.x"
   }
 }
