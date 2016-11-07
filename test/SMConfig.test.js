@@ -112,22 +112,22 @@ describe('SMConfig.js', () => {
             // Parameter config not present
             assert.throws(() => {
                 new SMConfig()
-            })
+            }, /must be set/i)
 
-            // Parameter config is not an object
+            // Parameter config not a string neither an object
             assert.throws(() => {
-                new SMConfig('hello world')
-            })
+                new SMConfig(12)
+            }, /must be a string or an object/i)
 
             // Missing config.default
             assert.throws(() => {
                 new SMConfig({a: 1})
-            })
+            }, /cannot find default environment/i)
 
             // config.default is not an object
             assert.throws(() => {
                 new SMConfig({default: 1})
-            })
+            }, /cannot find default environment/i)
 
             // All ok
             let config = new SMConfig({default: {}})
@@ -328,6 +328,11 @@ describe('SMConfig.js', () => {
             assert.deepStrictEqual(config.get('a'), 1)
             assert.deepStrictEqual(config.get('b'), 'ale')
             assert.deepStrictEqual(config.get('foo'), ['bar'])
+
+            // Passing a key that is not a string should throw an exception
+            assert.throws(() => {
+                config.get(12)
+            }, /non\-empty string/i)
         })
     })
 })

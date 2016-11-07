@@ -241,34 +241,28 @@ class SMConfig {
             let hostname = os.hostname()
 
             for(let e in hostnames) {
-                if(!hostnames.hasOwnProperty(e)) {
-                    continue
-                }
-
                 // Ensure the value is a non-empty array
-                if(!hostnames[e] || !Array.isArray(hostnames[e])) {
-                    continue
-                }
-
-                // Iterate through the list of hostnames
-                for(let i in hostnames[e]) {
-                    let v = hostnames[e][i]
-                    if(!v) {
-                        continue
-                    }
-
-                    if(typeof v == 'string') {
-                        // Value is a string
-                        if(SMHelper.strIs(v, hostname)) {
-                            // Return the value from the function
-                            return e
+                if(hostnames.hasOwnProperty(e) && hostnames[e] && Array.isArray(hostnames[e])) {
+                    // Iterate through the list of hostnames
+                    for(let i in hostnames[e]) {
+                        let v = hostnames[e][i]
+                        if(!v) {
+                            continue
                         }
-                    }
-                    else if(v instanceof RegExp) {
-                        // Value is a RegExp
-                        if(v.test(hostname)) {
-                            // Return the value from the function
-                            return e
+
+                        if(typeof v == 'string') {
+                            // Value is a string
+                            if(SMHelper.strIs(v, hostname)) {
+                                // Return the value from the function
+                                return e
+                            }
+                        }
+                        else if(v instanceof RegExp) {
+                            // Value is a RegExp
+                            if(v.test(hostname)) {
+                                // Return the value from the function
+                                return e
+                            }
                         }
                     }
                 }
@@ -285,22 +279,20 @@ class SMConfig {
 
         // Loop through environmental variables that can override configuration
         for(let key in process.env) {
-            if(!process.env.hasOwnProperty(key)) {
-                continue
-            }
+            if(process.env.hasOwnProperty(key)) {
+                // String.startsWith is available only in Node 6+
+                if(key.substr(0, envVarPrefix.length) === envVarPrefix) {
+                    // Convert the key to the right format
+                    let keyCamelCase = SMHelper.stringToCamel(key.substr(envVarPrefix.length).toLowerCase())
+                    let value = process.env[key]
 
-            // String.startsWith is available only in Node 6+
-            if(key.substr(0, envVarPrefix.length) === envVarPrefix) {
-                // Convert the key to the right format
-                let keyCamelCase = SMHelper.stringToCamel(key.substr(envVarPrefix.length).toLowerCase())
-                let value = process.env[key]
+                    // Check if value is a numeric string, then convert to number (float)
+                    if(SMHelper.isNumeric(value)) {
+                        value = parseFloat(value)
+                    }
 
-                // Check if value is a numeric string, then convert to number (float)
-                if(SMHelper.isNumeric(value)) {
-                    value = parseFloat(value)
+                    result[keyCamelCase] = value
                 }
-
-                result[keyCamelCase] = value
             }
         }
 
