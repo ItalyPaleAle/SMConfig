@@ -48,7 +48,8 @@ describe('SMConfig.js', () => {
             },
             hostnames: {
                 testenv1: [
-                    'a--not-found'
+                    'a--not-found',
+                    null
                 ],
                 testenv2: [
                     '--not-found-2',
