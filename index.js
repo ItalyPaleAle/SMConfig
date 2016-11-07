@@ -61,14 +61,14 @@ class SMConfig {
 	 * parsed using SMHelper.strIs, so the '*' token can be used as wildcard.
 	 * 
 	 * The environment is determined by, in order:
-	 * 1. The value passed in the `env` parameter
+	 * 1. The value passed to the `env` parameter
 	 * 2. The `NODE_ENV` environmental variable
 	 * 3. The environment that is configured for the hostname
 	 * 4. Fallback to the `default` environment
 	 * 
 	 * @param {Object|string} config - Configuration params or filename to load
 	 * @param {string} [env] - Optional set environment
-	 * @param {string} [envVarPrefix] - Prefix for environmental variables (default: `APPSETTING_`)
+	 * @param {string} [envVarPrefix='APPSETTING_'] - Prefix for environmental variables
 	 */
 	constructor(config, env, envVarPrefix) {
 		// Ensure the config object is set
