@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: SMConfig</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: SMConfig</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>SMConfig</h2>
+        
+            <div class="class-description"><p>Environment and configuration utilities</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="SMConfig"><span class="type-signature"></span>new SMConfig<span class="signature">(config, env<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Initializes the class, determining the environment, then
+loading the configuration for the environment and storing it in the object.</p>
+<p>The environment is determined by, in order:</p>
+<ol>
+<li>The value passed to the <strong><code>env</code></strong> parameter</li>
+<li>The <code>NODE_ENV</code> environmental variable</li>
+<li>The environment that is configured for the hostname</li>
+<li>Fallback to the <code>default</code> environment</li>
+</ol>
+<p>The <strong><code>config</code></strong> parameter can be an object with the configuration values,
+or a string representing a JSON/YAML/Hjson file to load. File type is
+determined by the extension: <em>.json, </em>.yml/<em>.yaml, </em>.hjson</p>
+<p>When using YAML files, you can also represent additional JavaScript
+typtes that are not allowed by JSON and Hjson:</p>
+<ul>
+<li>RegExp: <code>!!js/regexp /pattern/gim</code></li>
+<li>Functions: <code>!!js/function 'function () {...}'</code></li>
+<li>Undefined: <code>!!js/undefined ''</code></li>
+</ul>
+<p>The configuration object should have the following structure:</p>
+<pre class="prettyprint source lang-js"><code>{
+    // Default configuration, for all environments
+    default: {
+        key1: 'value1',
+        key2: 'value2'
+    },
+
+    // Each subsequent key is the name of the environment;
+    // this can be anything you want
+    dev: {
+        // Custom environments inherit all keys from the default
+        // environment, but can be overwritten here
+        key1: 'override',
+        newkey: 'helloworld'
+    },
+    production: {
+        key1: 'override'
+    },
+    otherenvironment: {},
+
+    // The hostnames object contains a list of hostnames that are
+    // mapped to a specific environment.
+    hostnames: {
+        // Name of the environment, then list of hostnames
+        dev: [
+            'laptop.localdomain'
+        ],
+        production: [
+            // Can use * as wildcard
+            '*.example.com',
+            // Can also use RegExp objects
+            /(.*?)\.example\.com$/i
+        ]
+    }
+}</code></pre><p>Configuration values can always be overridden at runtime by passing
+environmental variables to the application. To be considered, environmental
+variables must start with a prefix, configured with the
+<strong><code>options.envVarPrefix</code></strong> setting (default: <code>APPSETTING_</code>) Environmental
+variables are lowercased then converted to camelCase, for example
+<code>APPSETTING_SECRET_KEY</code> becomes <code>secretKey</code>.
+Values passed via environmental variables are strings, but numeric ones
+(those representing a number) are converted to numbers.</p>
+<p>Values in the hostnames array can be RegExp objects or strings. Strings are
+parsed using <code>SMHelper.strIs</code>, so the <code>*</code> token can be used as wildcard.</p>
+<p>When <strong><code>options.flatten</code></strong> is true, as per default value, the configuration
+data is also &quot;flattened&quot; into a dictionary that uses &quot;dot notation&quot;. This
+is done with <code>SMHelper.objectToDotNotation</code>. By &quot;flattening&quot; the dictionary,
+it's possible to use the <code>get()</code> method to retrieve nested properties, such
+as in <code>config.get('database.credentials.password')</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Configuration params or filename to load</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>env</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    default
+                
+                </td>
+            
+
+            <td class="description last"><p>Force a specific environment</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Advanced options dictionary</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>envVarPrefix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    APPSETTING_
+                
+                </td>
+            
+
+            <td class="description last"><p>Prefix for Environmental
+variables</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>flatten</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>When true, configuration object is
+also flatened to &quot;dot notation&quot;</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line12">line 12</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="all"><span class="type-signature"></span>all<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>All configuration parameters (read-only)</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line177">line 177</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="environment"><span class="type-signature"></span>environment<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>Environment name</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line169">line 169</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(key)</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Return value for key from configuration</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Configuration key to retrieve</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line186">line 186</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Value for the key</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SMConfig.html">SMConfig</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a>
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
