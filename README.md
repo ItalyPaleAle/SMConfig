@@ -1,6 +1,9 @@
 # SMConfig
 
-[![Build Status](https://travis-ci.org/EgoAleSum/SMConfig.svg?branch=master)](https://travis-ci.org/EgoAleSum/SMConfig) [![Coverage Status](https://coveralls.io/repos/github/EgoAleSum/SMConfig/badge.svg?branch=master)](https://coveralls.io/github/EgoAleSum/SMConfig?branch=master)
+[![Build Status](https://travis-ci.org/EgoAleSum/SMConfig.svg?branch=master)](https://travis-ci.org/EgoAleSum/SMConfig)
+[![Coverage Status](https://coveralls.io/repos/github/EgoAleSum/SMConfig/badge.svg?branch=master)](https://coveralls.io/github/EgoAleSum/SMConfig?branch=master)
+[![Dependency Status](https://david-dm.org/EgoAleSum/SMConfig.svg?style=flat)](https://david-dm.org/EgoAleSum/SMConfig)
+[![devDependency Status](https://david-dm.org/EgoAleSum/SMConfig/dev-status.svg?style=flat)](https://david-dm.org/EgoAleSum/SMConfig#info=devDependencies)
 
 Application configuration module for Node.js.
 
