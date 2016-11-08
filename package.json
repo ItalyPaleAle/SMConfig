@@ -28,6 +28,7 @@
   "dependencies": {
     "hjson": "2.3.x",
     "js-yaml": "3.6.x",
+    "lodash.merge": "4.6.x",
     "smhelper": "1.0.x"
   },
   "devDependencies": {

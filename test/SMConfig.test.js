@@ -77,8 +77,12 @@ describe('SMConfig.js', () => {
             number: 6,
             ary: [0, 1, 1, 2, 3, 5, 8, 13, 21],
             obj: {
+                x: 1,
+                y: 2,
                 z: 3
             },
+            'obj.x': 1,
+            'obj.y': 2,
             'obj.z': 3,
             add: 'me'
         }

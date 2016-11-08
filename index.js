@@ -4,6 +4,7 @@ const os = require('os')
 const fs = require('fs')
 const yaml = require('js-yaml')
 const hjson = require('hjson')
+const lodashMerge = require('lodash.merge')
 const SMHelper = require('smhelper')
 
 /**
@@ -151,14 +152,14 @@ class SMConfig {
         // 2. Environment config
         // 3. Default config
         // Store the result in the object
-        this._config = Object.assign({}, configData.default, envConfig, envVars)
+        this._config = lodashMerge({}, configData.default, envConfig, envVars)
 
         // Flatten all nested objects to dot notation, if necessary
         if(options.flatten) {
             let flat = SMHelper.objectToDotNotation(this._config, true)
 
             // Store in the object a merged dictionary, flattened and unflattened
-            this._config = Object.assign({}, flat, this._config)
+            this._config = lodashMerge({}, flat, this._config)
         }
     }
 
