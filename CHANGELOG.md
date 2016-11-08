@@ -1,5 +1,11 @@
 # SMConfig
 
+## v0.2.1 - 2016-11-08
+
+**Fixes**
+
+- When environments override the default configuration, dictionaries are merged recursively.
+
 ## v0.2.0 - 2016-11-07
 
 **New features**
