@@ -1,6 +1,6 @@
 {
   "name": "smconfig",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Application configuration module for Node.js",
   "main": "index.js",
   "directories": {
@@ -17,7 +17,8 @@
   },
   "keywords": [
     "configuration",
-    "config"
+    "config",
+    "environments"
   ],
   "author": "Alessandro Segala, SixthMonkey",
   "license": "BSD-2-Clause",
@@ -26,8 +27,8 @@
   },
   "homepage": "https://github.com/EgoAleSum/SMConfig#readme",
   "dependencies": {
-    "hjson": "2.3.x",
-    "js-yaml": "3.6.x",
+    "hjson": "2.4.x",
+    "js-yaml": "3.7.x",
     "lodash.merge": "4.6.x",
     "smhelper": "1.0.x"
   },
@@ -35,7 +36,7 @@
     "coveralls": "2.11.x",
     "istanbul": "0.4.x",
     "jsdoc": "3.4.x",
-    "mocha": "3.1.x",
+    "mocha": "3.2.x",
     "mocha-lcov-reporter": "1.2.x",
     "should": "11.1.x"
   }
