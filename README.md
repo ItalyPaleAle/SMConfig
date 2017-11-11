@@ -111,7 +111,7 @@ When using YAML, you can also use the following types that are not supported by 
 - Functions: `!!js/function 'function () {...}'`
 - Undefined: `!!js/undefined ''`
 
-Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with environmental variables. These values are prefixed with **`options.envVarPrefix`**, which defaults to `APPSETTING_`; the prefix is then removed, the key is lowercased and converted to camelCase. For example:
+Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with environmental variables. These values are prefixed with **`options.envVarPrefix`**, which defaults to `APPSETTING_`; the prefix is then removed, the key is lowercased and converted to camelCase. You can also update a nested object by using a double underscore. For example:
 
 ````sh
 # SMConfig will store 'Passw0rd' for the 'databaseConfiguration' key
@@ -120,6 +120,9 @@ $ APPSETTING_DATABASE_PASSWORD=Passw0rd node myapp.js
 # You can use a custom prefix by changing envVarPrefix,
 # for example to CUSTOMPREFIX_
 $ CUSTOMPREFIX_DATABASE_PASSWORD=Passw0rd node myapp.js
+
+# You can update a nested object, for example oauth.secretKe, using double udnerscores
+$ APPSETTING_OAUTH__SECRET_KEY=Secr3t node myapp.js
 ````
 
 When **`options.flatten`** is true, as per default value, the configuration data is also "flattened" into a dictionary that uses "dot notation". For example, imagine the following configuration:
