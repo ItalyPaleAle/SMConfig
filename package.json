@@ -1,6 +1,6 @@
 {
   "name": "smconfig",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Application configuration module for Node.js",
   "main": "index.js",
   "directories": {
@@ -18,7 +18,8 @@
   "keywords": [
     "configuration",
     "config",
-    "environments"
+    "environments",
+    "hapi"
   ],
   "author": "Alessandro Segala, SixthMonkey",
   "license": "BSD-2-Clause",

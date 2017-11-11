@@ -14,6 +14,7 @@ Features:
 - Automatic environment detection based on hostname
 - Override configuration at runtime with environmental variables
 - Supports loading configuration from JSON, YAML and [Hjson](http://hjson.org) documents
+- Offers a plugin for Hapi
 
 This code is licensed under the terms of the BSD (2-clause) license (see LICENSE.md).
 
@@ -38,7 +39,7 @@ The module exports a class named `SMConfig`.
 ### Constructor: SMConfig(config, env, options)
 
 ````js
-let config = new SMConfig(config, env, options)
+let conf = new SMConfig(config, env, options)
 ````
 
 Parameters:
@@ -190,3 +191,21 @@ let allConfiguration = config.all
 ````
 
 The **`all`** property, which is read-only, contains all the configuration variables for the current environment.
+
+## Hapi plugin
+
+This module offers an optional plugin for [Hapi](https://hapijs.com/) (version 17 or higher required).
+
+To use it, initialize the SMConfig object as normal, then register the plugin with Hapi passing the instance of SMConfig.
+
+Example:
+
+````js
+const SMConfig = require('smconfig')
+const conf = new SMConfig(config, env, options)
+
+await server.register({
+    plugin: require('smconfig/plugins/hapi'),
+    options: {config: conf}
+})
+````

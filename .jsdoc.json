@@ -10,6 +10,7 @@
     "source": {
         "include": [
             "./",
+            "./plugins",
             "./README.md"
         ],
         "exclude": [

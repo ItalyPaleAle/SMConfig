@@ -55,12 +55,13 @@
 <li>Automatic environment detection based on hostname</li>
 <li>Override configuration at runtime with environmental variables</li>
 <li>Supports loading configuration from JSON, YAML and <a href="http://hjson.org">Hjson</a> documents</li>
+<li>Offers a plugin for Hapi</li>
 </ul>
 <p>This code is licensed under the terms of the BSD (2-clause) license (see LICENSE.md).</p>
 <h2>Add to your project</h2><p>Install from NPM:</p>
 <pre class="prettyprint source lang-sh"><code>npm install --save smconfig</code></pre><h2>API Guide</h2><p>Include the module with:</p>
 <pre class="prettyprint source lang-js"><code>const SMConfig = require('smconfig')</code></pre><p>The module exports a class named <code>SMConfig</code>.</p>
-<h3>Constructor: SMConfig(config, env, options)</h3><pre class="prettyprint source lang-js"><code>let config = new SMConfig(config, env, options)</code></pre><p>Parameters:</p>
+<h3>Constructor: SMConfig(config, env, options)</h3><pre class="prettyprint source lang-js"><code>let conf = new SMConfig(config, env, options)</code></pre><p>Parameters:</p>
 <ul>
 <li><code>config</code>: configuration object (read below for description)</li>
 <li><code>env</code>: when set, forces a specific environment</li>
@@ -174,7 +175,17 @@ let nested = config.get('database.credentials.password')</code></pre><p>Returns 
 <h3>SMConfig.environment</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
 let env = config.environment</code></pre><p>The <strong><code>environment</code></strong> property, which is read-only, contains the name of the environment being used by the application.</p>
 <h3>SMConfig.all</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
-let allConfiguration = config.all</code></pre><p>The <strong><code>all</code></strong> property, which is read-only, contains all the configuration variables for the current environment.</p></article>
+let allConfiguration = config.all</code></pre><p>The <strong><code>all</code></strong> property, which is read-only, contains all the configuration variables for the current environment.</p>
+<h2>Hapi plugin</h2><p>This module offers an optional plugin for <a href="https://hapijs.com/">Hapi</a> (version 17 or higher required).</p>
+<p>To use it, initialize the SMConfig object as normal, then register the plugin with Hapi passing the instance of SMConfig.</p>
+<p>Example:</p>
+<pre class="prettyprint source lang-js"><code>const SMConfig = require('smconfig')
+const conf = new SMConfig(config, env, options)
+
+await server.register({
+    plugin: require('smconfig/plugins/hapi'),
+    options: {config: conf}
+})</code></pre></article>
     </section>
 
 
