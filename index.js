@@ -242,6 +242,7 @@ class SMConfig {
 
             for(let e in hostnames) {
                 // Ensure the value is a non-empty array
+                /* istanbul ignore else */
                 if(hostnames.hasOwnProperty(e) && hostnames[e] && Array.isArray(hostnames[e])) {
                     // Iterate through the list of hostnames
                     for(let i in hostnames[e]) {
@@ -257,6 +258,7 @@ class SMConfig {
                                 return e
                             }
                         }
+                        /* istanbul ignore else */
                         else if(v instanceof RegExp) {
                             // Value is a RegExp
                             if(v.test(hostname)) {
@@ -279,6 +281,7 @@ class SMConfig {
 
         // Loop through environmental variables that can override configuration
         for(let key in process.env) {
+            /* istanbul ignore else */
             if(process.env.hasOwnProperty(key)) {
                 // String.startsWith is available only in Node 6+
                 if(key.substr(0, envVarPrefix.length) === envVarPrefix) {
