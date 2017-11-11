@@ -132,10 +132,11 @@ class SMConfig {
             throw Error('Cannot find default environment configuration in config parameter')
         }
 
-        // Default value for envVarPrefix
-        options.envVarPrefix = options.envVarPrefix
-            ? SMHelper.toStringSafe(options.envVarPrefix)
-            : 'APPSETTING_'
+        // Sanitize envVarPrefix
+        if(!options.envVarPrefix) {
+            throw Error('envVarPrefix option must not be empty')
+        }
+        options.envVarPrefix = SMHelper.toStringSafe(options.envVarPrefix)
 
         // Get the name of the current environment
         this._environment = this._getEnvironment(env, configData.hostnames)
@@ -224,12 +225,9 @@ class SMConfig {
     // Get the current environment
     _getEnvironment(env, hostnames) {
         // 1. The value passed in the `env` parameter
+        env = env ? SMHelper.toStringSafe(env) : null
         if(env) {
-            // Ensure env is a string
-            env = SMHelper.toStringSafe(env)
-            if(env) {
-                return env
-            }
+            return env
         }
 
         // 2. The NODE_ENV environmental variable

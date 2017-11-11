@@ -211,6 +211,9 @@ describe('SMConfig.js', () => {
 
             let config = new SMConfig(params)
             assert.equal(config.environment, 'envvar')
+
+            // Cleanup
+            delete process.env.NODE_ENV
         })
 
         it('Environment: passing environment to constructor', () => {
@@ -300,6 +303,12 @@ describe('SMConfig.js', () => {
             delete process.env.SET_WHEN
             delete process.env.SET_FOO
             delete process.env.SET_SOME_FLOAT
+        })
+
+        it('Configuration: overwrite at runtime with environmental variables (invalid prefix)', () => {
+            assert.throws(() => {
+                new SMConfig(params, 'default', {envVarPrefix: ''})
+            }, /empty/)
         })
 
         it('Configuration: file does not exist', () => {
