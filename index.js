@@ -76,7 +76,8 @@ class SMConfig {
      * variables must start with a prefix, configured with the
      * **`options.envVarPrefix`** setting (default: `APPSETTING_`) Environmental
      * variables are lowercased then converted to camelCase, for example
-     * `APPSETTING_SECRET_KEY` becomes `secretKey`.
+     * `APPSETTING_SECRET_KEY` becomes `secretKey`. The double underscore can be used
+     * to pass nested options, so `APPSETTING_DB__PASSWORD` becomes `db.password`.
      * Values passed via environmental variables are strings, but numeric ones
      * (those representing a number) are converted to numbers.
      *
@@ -283,16 +284,24 @@ class SMConfig {
             if(process.env.hasOwnProperty(key)) {
                 // String.startsWith is available only in Node 6+
                 if(key.substr(0, envVarPrefix.length) === envVarPrefix) {
-                    // Convert the key to the right format
-                    let keyCamelCase = SMHelper.stringToCamel(key.substr(envVarPrefix.length).toLowerCase())
-                    let value = process.env[key]
+                    // The double underscore can be used to get to nested objects
+                    // Then convert the key to camelCase
+                    let updateKey = key
+                        .substr(envVarPrefix.length)
+                        .split('__')
+                        .map((str) => {
+                            return SMHelper.stringToCamel(str.toLowerCase())
+                        })
+                        .join('.')
 
                     // Check if value is a numeric string, then convert to number (float)
+                    let value = process.env[key]
                     if(SMHelper.isNumeric(value)) {
                         value = parseFloat(value)
                     }
 
-                    result[keyCamelCase] = value
+                    // Update the nested object
+                    SMHelper.updatePropertyInObject(result, updateKey, value)
                 }
             }
         }

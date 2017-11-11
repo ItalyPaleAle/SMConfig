@@ -254,6 +254,33 @@ describe('SMConfig.js', () => {
 
             let config = new SMConfig(params, 'testenv2')
             assert.deepStrictEqual(config.all, expect)
+
+            // Cleanup
+            delete process.env.APPSETTING_WHEN
+            delete process.env.APPSETTING_FIRST
+            delete process.env.APPSETTING_INT_NUM
+        })
+
+        it('Configuration: overwrite at runtime with environmental variables (nested)', () => {
+            process.env.APPSETTING_OBJ__Z = 'New' // New
+            process.env.APPSETTING_OBJ__X = 'overwrite' // Overwrite
+            process.env.APPSETTING_OBJ__CAMEL_CASE = '-8' // camelCase
+
+            let expect = SMHelper.cloneObject(testenv2Expect)
+            expect.obj.z = 'New'
+            expect.obj.x = 'overwrite'
+            expect.obj.camelCase = -8
+            expect['obj.z'] = 'New'
+            expect['obj.x'] = 'overwrite'
+            expect['obj.camelCase'] = -8
+
+            let config = new SMConfig(params, 'testenv2')
+            assert.deepStrictEqual(config.all, expect)
+
+            // Cleanup
+            delete process.env.APPSETTING_OBJ__Z
+            delete process.env.APPSETTING_OBJ__X
+            delete process.env.APPSETTING_OBJ__CAMEL_CASE
         })
 
         it('Configuration: overwrite at runtime with environmental variables (custom prefix)', () => {
@@ -268,6 +295,11 @@ describe('SMConfig.js', () => {
 
             let config = new SMConfig(params, 'default', {envVarPrefix: 'SET_'})
             assert.deepStrictEqual(config.all, expect)
+
+            // Cleanup
+            delete process.env.SET_WHEN
+            delete process.env.SET_FOO
+            delete process.env.SET_SOME_FLOAT
         })
 
         it('Configuration: file does not exist', () => {
