@@ -1,5 +1,4 @@
-Copyright (c) 2014-2016, Alessandro Segala & SixthMonkey
-All rights reserved.
+Copyright (c) 2014-2018, Alessandro Segala & SixthMonkey
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
