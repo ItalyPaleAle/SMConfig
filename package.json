@@ -7,9 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report html -- -R spec",
-    "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
-    "jsdoc": "./node_modules/jsdoc/jsdoc.js -c .jsdoc.json"
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report html -- -R spec",
+    "test-travis": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "eslint": "./node_modules/.bin/eslint -c .eslintrc.yml .",
+    "jsdoc": "./node_modules/.bin/jsdoc -c .jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.1",
+    "eslint": "^5.0.0",
     "istanbul": "^0.4.5",
     "jsdoc": "^3.5.5",
     "mocha": "^5.2.0",

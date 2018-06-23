@@ -100,10 +100,10 @@ class SMConfig {
      */
     constructor(config, env, options) {
         // Ensure options is an object
-        if(options && !SMHelper.isPlainObject(options)) {
+        if (options && !SMHelper.isPlainObject(options)) {
             throw Error('The options parameter must be a dictionary')
         }
-        else if(!options) {
+        else if (!options) {
             options = {}
         }
 
@@ -114,26 +114,26 @@ class SMConfig {
         }, options)
 
         // Ensure the config object is set
-        if(!config) {
+        if (!config) {
             throw Error('Parameter config must be set')
         }
-        if(typeof config != 'string' && !SMHelper.isPlainObject(config)) {
+        if (typeof config != 'string' && !SMHelper.isPlainObject(config)) {
             throw Error('Parameter config must be a string or an object')
         }
 
         // If config is a string, load the file; otherwise, config is an object
         // that already contains the configuration
-        let configData = (typeof config == 'string')
+        const configData = (typeof config == 'string')
             ? this._loadConfigFile(config)
             : config
 
         // Ensure configData contains the default configuration
-        if(!configData.default || !SMHelper.isPlainObject(configData.default)) {
+        if (!configData.default || !SMHelper.isPlainObject(configData.default)) {
             throw Error('Cannot find default environment configuration in config parameter')
         }
 
         // Sanitize envVarPrefix
-        if(!options.envVarPrefix) {
+        if (!options.envVarPrefix) {
             throw Error('envVarPrefix option must not be empty')
         }
         options.envVarPrefix = SMHelper.toStringSafe(options.envVarPrefix)
@@ -142,12 +142,12 @@ class SMConfig {
         this._environment = this._getEnvironment(env, configData.hostnames)
 
         // Load environmental-specific configuration
-        let envConfig = (configData[this.environment] && SMHelper.isPlainObject(configData[this.environment]))
+        const envConfig = (configData[this.environment] && SMHelper.isPlainObject(configData[this.environment]))
             ? configData[this.environment]
             : {}
 
         // Lastly, load configuration from environmental variables
-        let envVars = this._loadEnvironmentalVariables(options.envVarPrefix)
+        const envVars = this._loadEnvironmentalVariables(options.envVarPrefix)
 
         // Merge all the configuration, in order of priority:
         // 1. Runtime environmental variables
@@ -157,8 +157,8 @@ class SMConfig {
         this._config = lodashMerge({}, configData.default, envConfig, envVars)
 
         // Flatten all nested objects to dot notation, if necessary
-        if(options.flatten) {
-            let flat = SMHelper.objectToDotNotation(this._config, true)
+        if (options.flatten) {
+            const flat = SMHelper.objectToDotNotation(this._config, true)
 
             // Store in the object a merged dictionary, flattened and unflattened
             this._config = lodashMerge({}, flat, this._config)
@@ -187,7 +187,7 @@ class SMConfig {
      * @return {*} Value for the key
      */
     get(key) {
-        if(!key || typeof key != 'string') {
+        if (!key || typeof key != 'string') {
             throw Error('Parameter key must be a non-empty string')
         }
         return this._config[key]
@@ -198,21 +198,21 @@ class SMConfig {
     // Load config data from file
     _loadConfigFile(filename) {
         // Check if file exists
-        if(!fs.existsSync(filename)) {
+        if (!fs.existsSync(filename)) {
             throw Error('Configuration file doesn\'t exist')
         }
 
         // Determine file type by extension
-        let fileType = filename.split('.').pop().toLowerCase()
+        const fileType = filename.split('.').pop().toLowerCase()
 
         let configData
-        if(fileType == 'json') {
+        if (fileType == 'json') {
             configData = JSON.parse(fs.readFileSync(filename, 'utf8'))
         }
-        else if(fileType == 'yml' || fileType == 'yaml') {
+        else if (fileType == 'yml' || fileType == 'yaml') {
             configData = yaml.load(fs.readFileSync(filename, 'utf8'))
         }
-        else if(fileType == 'hjson') {
+        else if (fileType == 'hjson') {
             configData = hjson.parse(fs.readFileSync(filename, 'utf8'))
         }
         else {
@@ -226,42 +226,42 @@ class SMConfig {
     _getEnvironment(env, hostnames) {
         // 1. The value passed in the `env` parameter
         env = env ? SMHelper.toStringSafe(env) : null
-        if(env) {
+        if (env) {
             return env
         }
 
         // 2. The NODE_ENV environmental variable
-        if(process.env.NODE_ENV) {
+        if (process.env.NODE_ENV) {
             // Variables in process.env are always strings
             return process.env.NODE_ENV
         }
 
         // 3. The environment that is configured for the hostname
-        if(hostnames) {
-            let hostname = os.hostname()
+        if (hostnames) {
+            const hostname = os.hostname()
 
-            for(let e in hostnames) {
+            for (const e in hostnames) {
                 // Ensure the value is a non-empty array
                 /* istanbul ignore else */
-                if(hostnames.hasOwnProperty(e) && hostnames[e] && Array.isArray(hostnames[e])) {
+                if (hostnames.hasOwnProperty(e) && hostnames[e] && Array.isArray(hostnames[e])) {
                     // Iterate through the list of hostnames
-                    for(let i in hostnames[e]) {
-                        let v = hostnames[e][i]
-                        if(!v) {
+                    for (const i in hostnames[e]) {
+                        const v = hostnames[e][i]
+                        if (!v) {
                             continue
                         }
 
-                        if(typeof v == 'string') {
+                        if (typeof v == 'string') {
                             // Value is a string
-                            if(SMHelper.strIs(v, hostname)) {
+                            if (SMHelper.strIs(v, hostname)) {
                                 // Return the value from the function
                                 return e
                             }
                         }
                         /* istanbul ignore else */
-                        else if(v instanceof RegExp) {
+                        else if (v instanceof RegExp) {
                             // Value is a RegExp
-                            if(v.test(hostname)) {
+                            if (v.test(hostname)) {
                                 // Return the value from the function
                                 return e
                             }
@@ -277,17 +277,17 @@ class SMConfig {
 
     // Load additional configuration from environmental variables
     _loadEnvironmentalVariables(envVarPrefix) {
-        let result = {}
+        const result = {}
 
         // Loop through environmental variables that can override configuration
-        for(let key in process.env) {
+        for (const key in process.env) {
             /* istanbul ignore else */
-            if(process.env.hasOwnProperty(key)) {
+            if (process.env.hasOwnProperty(key)) {
                 // String.startsWith is available only in Node 6+
-                if(key.substr(0, envVarPrefix.length) === envVarPrefix) {
+                if (key.substr(0, envVarPrefix.length) === envVarPrefix) {
                     // The double underscore can be used to get to nested objects
                     // Then convert the key to camelCase
-                    let updateKey = key
+                    const updateKey = key
                         .substr(envVarPrefix.length)
                         .split('__')
                         .map((str) => {
@@ -297,7 +297,7 @@ class SMConfig {
 
                     // Check if value is a numeric string, then convert to number (float)
                     let value = process.env[key]
-                    if(SMHelper.isNumeric(value)) {
+                    if (SMHelper.isNumeric(value)) {
                         value = parseFloat(value)
                     }
 

@@ -29,10 +29,10 @@ module.exports = {
      */
     register: (server, options) => {
         // Ensure we have an instance of SMConfig
-        if(!options || !options.config) {
+        if (!options || !options.config) {
             throw Error('options.config must be set')
         }
-        if(!(options.config instanceof SMConfig)) {
+        if (!(options.config instanceof SMConfig)) {
             throw Error('options.config must be an instance of SMConfig')
         }
 
