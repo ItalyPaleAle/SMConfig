@@ -23,7 +23,7 @@
     "hapi"
   ],
   "author": "Alessandro Segala, SixthMonkey",
-  "license": "BSD-2-Clause",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/EgoAleSum/SMConfig/issues"
   },

@@ -16,7 +16,7 @@ Features:
 - Supports loading configuration from JSON, YAML and [Hjson](http://hjson.org) documents
 - Offers a plugin for Hapi
 
-This code is licensed under the terms of the BSD (2-clause) license (see LICENSE.md).
+This code is licensed under the terms of the MIT license (see LICENSE.md).
 
 ## Add to your project
 
