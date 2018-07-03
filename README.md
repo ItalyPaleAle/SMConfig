@@ -59,7 +59,7 @@ The environment is determined by, in order:
 3. The environment that is configured for the hostname (see below)
 4. Fallback to the `default` environment
 
-The **`config`** paramter can either be a JavaScript object or the filename (as string) of a JSON, YAML or Hjson file. The file type is determined by the extension, and supported ones are: `*.json`, `*.yaml`, `*.yml` and `*.hjson`.
+The **`config`** paramter can either be a plain JavaScript object or the filename (as string) of a JSON, YAML or Hjson file. It is also possible to pass an array of filenames to load, which will be read in the sequence they are passed. File type is determined by the extension, and supported ones are: `*.json`, `*.yaml`, `*.yml` and `*.hjson`.
 
 The configuration object must have the following basic structure:
 

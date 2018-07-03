@@ -22,8 +22,9 @@ class SMConfig {
      * 4. Fallback to the `default` environment
      *
      * The **`config`** parameter can be an object with the configuration values,
-     * or a string representing a JSON/YAML/Hjson file to load. File type is
-     * determined by the extension: *.json, *.yml/*.yaml, *.hjson
+     * or a string representing a JSON/YAML/Hjson file to load. It is also possible
+     * to pass an array of filenames to load, which will be read in the sequence they
+     * are passed. File type is determined by the extension: json, yml, yaml, hjson
      *
      * When using YAML files, you can also represent additional JavaScript
      * typtes that are not allowed by JSON and Hjson:
@@ -90,7 +91,7 @@ class SMConfig {
      * it's possible to use the `get()` method to retrieve nested properties, such
      * as in `config.get('database.credentials.password')`.
      * 
-     * @param {Object|string} config - Configuration params or filename to load
+     * @param {Object|string|string[]} config - Configuration params or filename(s) to load
      * @param {string} [env=default] - Force a specific environment
      * @param {object} [options] - Advanced options dictionary
      * @param {string} [options.envVarName=SMCONFIG] - Name of the environmental
@@ -117,15 +118,30 @@ class SMConfig {
         if (!config) {
             throw Error('Parameter config must be set')
         }
-        if (typeof config != 'string' && !SMHelper.isPlainObject(config)) {
-            throw Error('Parameter config must be a string or an object')
-        }
 
-        // If config is a string, load the file; otherwise, config is an object
-        // that already contains the configuration
-        const configData = (typeof config == 'string')
-            ? loadConfigFile(config)
-            : config
+        // If config is a string or array of strings, load the file(s); otherwise,
+        // config is an object that already contains the configuration
+        let configData = {}
+        // Single file to load
+        if (typeof config == 'string') {
+            configData = loadConfigFile(config)
+        }
+        // Array of files
+        else if (Array.isArray(config)) {
+            for (const i in config) {
+                if (typeof config[i] != 'string') {
+                    throw Error('Parameter config must be a string, an array of strings or a plain object')
+                }
+                configData = lodashMerge(configData, loadConfigFile(config[i]))
+            }
+        }
+        // Plain object
+        else if (SMHelper.isPlainObject(config)) {
+            configData = config
+        }
+        else {
+            throw Error('Parameter config must be a string, an array of strings or a plain object')
+        }
 
         // Ensure configData contains the default configuration
         if (!configData.default || !SMHelper.isPlainObject(configData.default)) {

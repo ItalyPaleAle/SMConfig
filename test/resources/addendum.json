@@ -1,0 +1,13 @@
+{
+  "default": {
+    "fruit": "pear"
+  },
+  "addendum": {
+    "fruit": "apricot"
+  },
+  "hostnames": {
+    "addendum": [
+      "b--not-found"
+    ]
+  }
+}
