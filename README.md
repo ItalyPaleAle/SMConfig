@@ -1,4 +1,4 @@
-# SMConfig v0.2
+# SMConfig v1.0
 
 [![Build Status](https://travis-ci.org/EgoAleSum/SMConfig.svg?branch=master)](https://travis-ci.org/EgoAleSum/SMConfig)
 [![Coverage Status](https://coveralls.io/repos/github/EgoAleSum/SMConfig/badge.svg?branch=master)](https://coveralls.io/github/EgoAleSum/SMConfig?branch=master)

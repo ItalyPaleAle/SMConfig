@@ -1,13 +1,11 @@
 'use strict'
 
-const os = require('os')
-const fs = require('fs')
-const yaml = require('js-yaml')
-const hjson = require('hjson')
 const lodashMerge = require('lodash.merge')
 const SMHelper = require('smhelper')
 
 const parseEnvVar = require('./lib/parseEnvVar')
+const loadConfigFile = require('./lib/loadConfigFile')
+const getEnvironment = require('./lib/getEnvironment')
 
 /**
  * Environment and configuration utilities
@@ -95,8 +93,8 @@ class SMConfig {
      * @param {Object|string} config - Configuration params or filename to load
      * @param {string} [env=default] - Force a specific environment
      * @param {object} [options] - Advanced options dictionary
-     * @param {string} [options.envVarName=SMCONFIG] - Prefix for Environmental
-     * variables
+     * @param {string} [options.envVarName=SMCONFIG] - Name of the environmental
+     *        variable with options passed at runtime.
      * @param {boolean} [options.flatten=true] - When true, configuration object is
      * also flatened to "dot notation"
      */
@@ -126,7 +124,7 @@ class SMConfig {
         // If config is a string, load the file; otherwise, config is an object
         // that already contains the configuration
         const configData = (typeof config == 'string')
-            ? this._loadConfigFile(config)
+            ? loadConfigFile(config)
             : config
 
         // Ensure configData contains the default configuration
@@ -141,7 +139,7 @@ class SMConfig {
         options.envVarName = SMHelper.toStringSafe(options.envVarName)
 
         // Get the name of the current environment
-        this._environment = this._getEnvironment(env, configData.hostnames)
+        this._environment = getEnvironment(env, configData.hostnames)
 
         // Load environmental-specific configuration
         const envConfig = (configData[this.environment] && SMHelper.isPlainObject(configData[this.environment]))
@@ -196,88 +194,6 @@ class SMConfig {
             throw Error('Parameter key must be a non-empty string')
         }
         return this._config[key]
-    }
-
-    /* !Private methods */
-
-    // Load config data from file
-    _loadConfigFile(filename) {
-        // Check if file exists
-        if (!fs.existsSync(filename)) {
-            throw Error('Configuration file doesn\'t exist')
-        }
-
-        // Determine file type by extension
-        const fileType = filename.split('.').pop().toLowerCase()
-
-        let configData
-        if (fileType == 'json') {
-            configData = JSON.parse(fs.readFileSync(filename, 'utf8'))
-        }
-        else if (fileType == 'yml' || fileType == 'yaml') {
-            configData = yaml.load(fs.readFileSync(filename, 'utf8'))
-        }
-        else if (fileType == 'hjson') {
-            configData = hjson.parse(fs.readFileSync(filename, 'utf8'))
-        }
-        else {
-            throw Error('Invalid config file format')
-        }
-
-        return configData
-    }
-
-    // Get the current environment
-    _getEnvironment(env, hostnames) {
-        // 1. The value passed in the `env` parameter
-        env = env ? SMHelper.toStringSafe(env) : null
-        if (env) {
-            return env
-        }
-
-        // 2. The NODE_ENV environmental variable
-        if (process.env.NODE_ENV) {
-            // Variables in process.env are always strings
-            return process.env.NODE_ENV
-        }
-
-        // 3. The environment that is configured for the hostname
-        if (hostnames) {
-            const hostname = os.hostname()
-
-            for (const e in hostnames) {
-                // Ensure the value is a non-empty array
-                /* istanbul ignore else */
-                if (hostnames.hasOwnProperty(e) && hostnames[e] && Array.isArray(hostnames[e])) {
-                    // Iterate through the list of hostnames
-                    for (const i in hostnames[e]) {
-                        const v = hostnames[e][i]
-                        if (!v) {
-                            continue
-                        }
-
-                        if (typeof v == 'string') {
-                            // Value is a string
-                            if (SMHelper.strIs(v, hostname)) {
-                                // Return the value from the function
-                                return e
-                            }
-                        }
-                        /* istanbul ignore else */
-                        else if (v instanceof RegExp) {
-                            // Value is a RegExp
-                            if (v.test(hostname)) {
-                                // Return the value from the function
-                                return e
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 4. Fallback to the default environment
-        return 'default'
     }
 }
 

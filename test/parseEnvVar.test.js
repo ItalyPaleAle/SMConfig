@@ -97,6 +97,14 @@ describe('parseEnvVar', function() {
             name: 'Leonardo Da Vinci'
         }
         assert.deepStrictEqual(test, expect)
+
+        // Using \ not as escape character
+        test = parseEnvVar('key=\'hello \\ world\' name="Leonardo \\\' Da Vinci"')
+        expect = {
+            key: 'hello \\ world',
+            name: 'Leonardo \\\' Da Vinci'
+        }
+        assert.deepStrictEqual(test, expect)
     })
 
     it('Quoted keys', function() {

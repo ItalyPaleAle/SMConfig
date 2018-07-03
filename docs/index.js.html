@@ -28,12 +28,12 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict'
 
-const os = require('os')
-const fs = require('fs')
-const yaml = require('js-yaml')
-const hjson = require('hjson')
 const lodashMerge = require('lodash.merge')
 const SMHelper = require('smhelper')
+
+const parseEnvVar = require('./lib/parseEnvVar')
+const loadConfigFile = require('./lib/loadConfigFile')
+const getEnvironment = require('./lib/getEnvironment')
 
 /**
  * Environment and configuration utilities
@@ -100,12 +100,12 @@ class SMConfig {
      * ````
      *
      * Configuration values can always be overridden at runtime by passing
-     * environmental variables to the application. To be considered, environmental
-     * variables must start with a prefix, configured with the
-     * **`options.envVarPrefix`** setting (default: `APPSETTING_`) Environmental
-     * variables are lowercased then converted to camelCase, for example
-     * `APPSETTING_SECRET_KEY` becomes `secretKey`. The double underscore can be used
-     * to pass nested options, so `APPSETTING_DB__PASSWORD` becomes `db.password`.
+     * environmental variables to the application. All values can be specified
+     * in a string with key-value pairs, in an environmental variable called
+     * `SMCONFIG` (name can be changed with the **`options.envVarName`**
+     * setting). Multiple key-value pairs can be passed in the same variable,
+     * separated by a space. If the value contains a space, quotes can be used
+     * to escape it.
      * Values passed via environmental variables are strings, but numeric ones
      * (those representing a number) are converted to numbers.
      *
@@ -121,8 +121,8 @@ class SMConfig {
      * @param {Object|string} config - Configuration params or filename to load
      * @param {string} [env=default] - Force a specific environment
      * @param {object} [options] - Advanced options dictionary
-     * @param {string} [options.envVarPrefix=APPSETTING_] - Prefix for Environmental
-     * variables
+     * @param {string} [options.envVarName=SMCONFIG] - Name of the environmental
+     *        variable with options passed at runtime.
      * @param {boolean} [options.flatten=true] - When true, configuration object is
      * also flatened to "dot notation"
      */
@@ -137,7 +137,7 @@ class SMConfig {
 
         // Defaults for the options parameter
         options = Object.assign({
-            envVarPrefix: 'APPSETTING_',
+            envVarName: 'SMCONFIG',
             flatten: true
         }, options)
 
@@ -152,7 +152,7 @@ class SMConfig {
         // If config is a string, load the file; otherwise, config is an object
         // that already contains the configuration
         const configData = (typeof config == 'string')
-            ? this._loadConfigFile(config)
+            ? loadConfigFile(config)
             : config
 
         // Ensure configData contains the default configuration
@@ -160,14 +160,14 @@ class SMConfig {
             throw Error('Cannot find default environment configuration in config parameter')
         }
 
-        // Sanitize envVarPrefix
-        if (!options.envVarPrefix) {
-            throw Error('envVarPrefix option must not be empty')
+        // Sanitize envVarName
+        if (!options.envVarName) {
+            throw Error('envVarName option must not be empty')
         }
-        options.envVarPrefix = SMHelper.toStringSafe(options.envVarPrefix)
+        options.envVarName = SMHelper.toStringSafe(options.envVarName)
 
         // Get the name of the current environment
-        this._environment = this._getEnvironment(env, configData.hostnames)
+        this._environment = getEnvironment(env, configData.hostnames)
 
         // Load environmental-specific configuration
         const envConfig = (configData[this.environment] &amp;&amp; SMHelper.isPlainObject(configData[this.environment]))
@@ -175,7 +175,10 @@ class SMConfig {
             : {}
 
         // Lastly, load configuration from environmental variables
-        const envVars = this._loadEnvironmentalVariables(options.envVarPrefix)
+        let envVars = {}
+        if (process.env &amp;&amp; process.env[options.envVarName]) {
+            envVars = parseEnvVar(process.env[options.envVarName])
+        }
 
         // Merge all the configuration, in order of priority:
         // 1. Runtime environmental variables
@@ -220,123 +223,6 @@ class SMConfig {
         }
         return this._config[key]
     }
-
-    /* !Private methods */
-
-    // Load config data from file
-    _loadConfigFile(filename) {
-        // Check if file exists
-        if (!fs.existsSync(filename)) {
-            throw Error('Configuration file doesn\'t exist')
-        }
-
-        // Determine file type by extension
-        const fileType = filename.split('.').pop().toLowerCase()
-
-        let configData
-        if (fileType == 'json') {
-            configData = JSON.parse(fs.readFileSync(filename, 'utf8'))
-        }
-        else if (fileType == 'yml' || fileType == 'yaml') {
-            configData = yaml.load(fs.readFileSync(filename, 'utf8'))
-        }
-        else if (fileType == 'hjson') {
-            configData = hjson.parse(fs.readFileSync(filename, 'utf8'))
-        }
-        else {
-            throw Error('Invalid config file format')
-        }
-
-        return configData
-    }
-
-    // Get the current environment
-    _getEnvironment(env, hostnames) {
-        // 1. The value passed in the `env` parameter
-        env = env ? SMHelper.toStringSafe(env) : null
-        if (env) {
-            return env
-        }
-
-        // 2. The NODE_ENV environmental variable
-        if (process.env.NODE_ENV) {
-            // Variables in process.env are always strings
-            return process.env.NODE_ENV
-        }
-
-        // 3. The environment that is configured for the hostname
-        if (hostnames) {
-            const hostname = os.hostname()
-
-            for (const e in hostnames) {
-                // Ensure the value is a non-empty array
-                /* istanbul ignore else */
-                if (hostnames.hasOwnProperty(e) &amp;&amp; hostnames[e] &amp;&amp; Array.isArray(hostnames[e])) {
-                    // Iterate through the list of hostnames
-                    for (const i in hostnames[e]) {
-                        const v = hostnames[e][i]
-                        if (!v) {
-                            continue
-                        }
-
-                        if (typeof v == 'string') {
-                            // Value is a string
-                            if (SMHelper.strIs(v, hostname)) {
-                                // Return the value from the function
-                                return e
-                            }
-                        }
-                        /* istanbul ignore else */
-                        else if (v instanceof RegExp) {
-                            // Value is a RegExp
-                            if (v.test(hostname)) {
-                                // Return the value from the function
-                                return e
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 4. Fallback to the default environment
-        return 'default'
-    }
-
-    // Load additional configuration from environmental variables
-    _loadEnvironmentalVariables(envVarPrefix) {
-        const result = {}
-
-        // Loop through environmental variables that can override configuration
-        for (const key in process.env) {
-            /* istanbul ignore else */
-            if (process.env.hasOwnProperty(key)) {
-                // String.startsWith is available only in Node 6+
-                if (key.substr(0, envVarPrefix.length) === envVarPrefix) {
-                    // The double underscore can be used to get to nested objects
-                    // Then convert the key to camelCase
-                    const updateKey = key
-                        .substr(envVarPrefix.length)
-                        .split('__')
-                        .map((str) => {
-                            return SMHelper.stringToCamel(str.toLowerCase())
-                        })
-                        .join('.')
-
-                    // Check if value is a numeric string, then convert to number (float)
-                    let value = process.env[key]
-                    if (SMHelper.isNumeric(value)) {
-                        value = parseFloat(value)
-                    }
-
-                    // Update the nested object
-                    SMHelper.updatePropertyInObject(result, updateKey, value)
-                }
-            }
-        }
-
-        return result
-    }
 }
 
 module.exports = SMConfig
@@ -350,7 +236,7 @@ module.exports = SMConfig
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SMConfig.html">SMConfig</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-getEnvironment.html">getEnvironment</a></li><li><a href="module-loadConfigFile.html">loadConfigFile</a></li><li><a href="module-parseEnvVar.html">parseEnvVar</a></li></ul><h3>Classes</h3><ul><li><a href="SMConfig.html">SMConfig</a></li></ul>
 </nav>
 
 <br class="clear">

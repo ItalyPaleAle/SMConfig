@@ -108,12 +108,12 @@ typtes that are not allowed by JSON and Hjson:</p>
         ]
     }
 }</code></pre><p>Configuration values can always be overridden at runtime by passing
-environmental variables to the application. To be considered, environmental
-variables must start with a prefix, configured with the
-<strong><code>options.envVarPrefix</code></strong> setting (default: <code>APPSETTING_</code>) Environmental
-variables are lowercased then converted to camelCase, for example
-<code>APPSETTING_SECRET_KEY</code> becomes <code>secretKey</code>. The double underscore can be used
-to pass nested options, so <code>APPSETTING_DB__PASSWORD</code> becomes <code>db.password</code>.
+environmental variables to the application. All values can be specified
+in a string with key-value pairs, in an environmental variable called
+<code>SMCONFIG</code> (name can be changed with the <strong><code>options.envVarName</code></strong>
+setting). Multiple key-value pairs can be passed in the same variable,
+separated by a space. If the value contains a space, quotes can be used
+to escape it.
 Values passed via environmental variables are strings, but numeric ones
 (those representing a number) are converted to numbers.</p>
 <p>Values in the hostnames array can be RegExp objects or strings. Strings are
@@ -299,7 +299,7 @@ as in <code>config.get('database.credentials.password')</code>.</p>
 
         <tr>
             
-                <td class="name"><code>envVarPrefix</code></td>
+                <td class="name"><code>envVarName</code></td>
             
 
             <td class="type">
@@ -326,13 +326,13 @@ as in <code>config.get('database.credentials.password')</code>.</p>
             
                 <td class="default">
                 
-                    APPSETTING_
+                    SMCONFIG
                 
                 </td>
             
 
-            <td class="description last"><p>Prefix for Environmental
-variables</p></td>
+            <td class="description last"><p>Name of the environmental
+       variable with options passed at runtime.</p></td>
         </tr>
 
     
@@ -522,7 +522,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line180">line 180</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line183">line 183</a>
     </li></ul></dd>
     
 
@@ -594,7 +594,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line172">line 172</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line175">line 175</a>
     </li></ul></dd>
     
 
@@ -723,7 +723,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line189">line 189</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line192">line 192</a>
     </li></ul></dd>
     
 
@@ -789,7 +789,7 @@ also flatened to &quot;dot notation&quot;</p></td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SMConfig.html">SMConfig</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-getEnvironment.html">getEnvironment</a></li><li><a href="module-loadConfigFile.html">loadConfigFile</a></li><li><a href="module-parseEnvVar.html">parseEnvVar</a></li></ul><h3>Classes</h3><ul><li><a href="SMConfig.html">SMConfig</a></li></ul>
 </nav>
 
 <br class="clear">

@@ -43,7 +43,7 @@
 
 
     <section>
-        <article><h1>SMConfig v0.2</h1><p><a href="https://travis-ci.org/EgoAleSum/SMConfig"><img src="https://travis-ci.org/EgoAleSum/SMConfig.svg?branch=master" alt="Build Status"></a>
+        <article><h1>SMConfig v1.0</h1><p><a href="https://travis-ci.org/EgoAleSum/SMConfig"><img src="https://travis-ci.org/EgoAleSum/SMConfig.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/github/EgoAleSum/SMConfig?branch=master"><img src="https://coveralls.io/repos/github/EgoAleSum/SMConfig/badge.svg?branch=master" alt="Coverage Status"></a>
 <a href="https://david-dm.org/EgoAleSum/SMConfig"><img src="https://david-dm.org/EgoAleSum/SMConfig.svg?style=flat" alt="Dependency Status"></a>
 <a href="https://david-dm.org/EgoAleSum/SMConfig#info=devDependencies"><img src="https://david-dm.org/EgoAleSum/SMConfig/dev-status.svg?style=flat" alt="devDependency Status"></a></p>
@@ -57,16 +57,16 @@
 <li>Supports loading configuration from JSON, YAML and <a href="http://hjson.org">Hjson</a> documents</li>
 <li>Offers a plugin for Hapi</li>
 </ul>
-<p>This code is licensed under the terms of the BSD (2-clause) license (see LICENSE.md).</p>
+<p>This code is licensed under the terms of the MIT license (see LICENSE.md).</p>
 <h2>Add to your project</h2><p>Install from NPM:</p>
 <pre class="prettyprint source lang-sh"><code>npm install --save smconfig</code></pre><h2>API Guide</h2><p>Include the module with:</p>
 <pre class="prettyprint source lang-js"><code>const SMConfig = require('smconfig')</code></pre><p>The module exports a class named <code>SMConfig</code>.</p>
-<h3>Constructor: SMConfig(config, env, options)</h3><pre class="prettyprint source lang-js"><code>let conf = new SMConfig(config, env, options)</code></pre><p>Parameters:</p>
+<h3>Constructor: SMConfig(config, env, options)</h3><pre class="prettyprint source lang-js"><code>const conf = new SMConfig(config, env, options)</code></pre><p>Parameters:</p>
 <ul>
 <li><code>config</code>: configuration object (read below for description)</li>
 <li><code>env</code>: when set, forces a specific environment</li>
-<li><code>options</code>: dictionary with advanced options:<ul>
-<li><code>options.envVarPrefix</code>: prefix for environmental variables (default: <code>APPSETTING_</code>)</li>
+<li><code>options</code>: dictionary with options:<ul>
+<li><code>options.envVarName</code>: name of the environmental variable where options are passed (default: <code>SMCONFIG</code>)</li>
 <li><code>options.flatten</code>: when true, configuration object is also flatened to &quot;dot notation&quot; (default: true)</li>
 </ul>
 </li>
@@ -81,7 +81,7 @@
 </ol>
 <p>The <strong><code>config</code></strong> paramter can either be a JavaScript object or the filename (as string) of a JSON, YAML or Hjson file. The file type is determined by the extension, and supported ones are: <code>*.json</code>, <code>*.yaml</code>, <code>*.yml</code> and <code>*.hjson</code>.</p>
 <p>The configuration object must have the following basic structure:</p>
-<pre class="prettyprint source lang-js"><code>let config = {
+<pre class="prettyprint source lang-js"><code>const config = {
     // Default configuration, for all environments
     default: {
         key1: 'value1',
@@ -127,16 +127,18 @@
 <li>Functions: <code>!!js/function 'function () {...}'</code></li>
 <li>Undefined: <code>!!js/undefined ''</code></li>
 </ul>
-<p>Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with environmental variables. These values are prefixed with <strong><code>options.envVarPrefix</code></strong>, which defaults to <code>APPSETTING_</code>; the prefix is then removed, the key is lowercased and converted to camelCase. You can also update a nested object by using a double underscore. For example:</p>
-<pre class="prettyprint source lang-sh"><code># SMConfig will store 'Passw0rd' for the 'databaseConfiguration' key
-$ APPSETTING_DATABASE_PASSWORD=Passw0rd node myapp.js
+<p>Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with an environmental variable. The variable <code>SMCONFIG</code> (name can be changed with <strong><code>options.envVarName</code></strong>) can contain a set of key-values, for example:</p>
+<pre class="prettyprint source lang-sh"><code># SMConfig will store 'Passw0rd' for the 'databasePassword' key
+SMCONFIG=&quot;databasePassword=Passw0rd&quot; node myapp.js
 
-# You can use a custom prefix by changing envVarPrefix,
-# for example to CUSTOMPREFIX_
-$ CUSTOMPREFIX_DATABASE_PASSWORD=Passw0rd node myapp.js
+# Nested properties can be passed too, for example `database.password`
+SMCONFIG=&quot;database.password=Passw0rd&quot; node myapp.js
 
-# You can update a nested object, for example oauth.secretKe, using double udnerscores
-$ APPSETTING_OAUTH__SECRET_KEY=Secr3t node myapp.js</code></pre><p>When <strong><code>options.flatten</code></strong> is true, as per default value, the configuration data is also &quot;flattened&quot; into a dictionary that uses &quot;dot notation&quot;. For example, imagine the following configuration:</p>
+# Multiple values can be passed
+SMCONFIG=&quot;database.password=Passw0rd database.username=admin&quot; node myapp.js
+
+# If the value contains a space, quote it
+SMCONFIG=&quot;passphrase='hello world'&quot; node myapp.js</code></pre><p>When <strong><code>options.flatten</code></strong> is true, as per default value, the configuration data is also &quot;flattened&quot; into a dictionary that uses &quot;dot notation&quot;. For example, imagine the following configuration:</p>
 <pre class="prettyprint source lang-js"><code>console.log(config.all)
 
 // Output when
@@ -168,14 +170,14 @@ $ APPSETTING_OAUTH__SECRET_KEY=Secr3t node myapp.js</code></pre><p>When <strong>
     &quot;database.ports&quot;: [8000, 8001],
     &quot;otherkey&quot;: &quot;otherval&quot;
 }</code></pre><h3>SMConfig.get(key)</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
-let databasePassword = config.get('databasePassword')
+const databasePassword = config.get('databasePassword')
 
 // If options.flatten is true, you can also access &quot;nested&quot; keys
-let nested = config.get('database.credentials.password')</code></pre><p>Returns the value for the key passed as argument, reading from the configuration for the environment.</p>
+const nested = config.get('database.credentials.password')</code></pre><p>Returns the value for the key passed as argument, reading from the configuration for the environment.</p>
 <h3>SMConfig.environment</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
-let env = config.environment</code></pre><p>The <strong><code>environment</code></strong> property, which is read-only, contains the name of the environment being used by the application.</p>
+const env = config.environment</code></pre><p>The <strong><code>environment</code></strong> property, which is read-only, contains the name of the environment being used by the application.</p>
 <h3>SMConfig.all</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
-let allConfiguration = config.all</code></pre><p>The <strong><code>all</code></strong> property, which is read-only, contains all the configuration variables for the current environment.</p>
+const allConfiguration = config.all</code></pre><p>The <strong><code>all</code></strong> property, which is read-only, contains all the configuration variables for the current environment.</p>
 <h2>Hapi plugin</h2><p>This module offers an optional plugin for <a href="https://hapijs.com/">Hapi</a> (version 17 or higher required).</p>
 <p>To use it, initialize the SMConfig object as normal, then register the plugin with Hapi passing the instance of SMConfig.</p>
 <p>Example:</p>
@@ -196,7 +198,7 @@ await server.register({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="SMConfig.html">SMConfig</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-getEnvironment.html">getEnvironment</a></li><li><a href="module-loadConfigFile.html">loadConfigFile</a></li><li><a href="module-parseEnvVar.html">parseEnvVar</a></li></ul><h3>Classes</h3><ul><li><a href="SMConfig.html">SMConfig</a></li></ul>
 </nav>
 
 <br class="clear">
