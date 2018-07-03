@@ -39,14 +39,15 @@ The module exports a class named `SMConfig`.
 ### Constructor: SMConfig(config, env, options)
 
 ````js
-let conf = new SMConfig(config, env, options)
+const conf = new SMConfig(config, env, options)
 ````
 
 Parameters:
+
 - `config`: configuration object (read below for description)
 - `env`: when set, forces a specific environment
-- `options`: dictionary with advanced options:
-    - `options.envVarPrefix`: prefix for environmental variables (default: `APPSETTING_`)
+- `options`: dictionary with options:
+    - `options.envVarName`: name of the environmental variable where options are passed (default: `SMCONFIG`)
     - `options.flatten`: when true, configuration object is also flatened to "dot notation" (default: true)
 
 The constructor determines the environment, then loads the configuration for the environment and stores it in the object.
@@ -63,7 +64,7 @@ The **`config`** paramter can either be a JavaScript object or the filename (as 
 The configuration object must have the following basic structure:
 
 ````js
-let config = {
+const config = {
     // Default configuration, for all environments
     default: {
         key1: 'value1',
@@ -112,18 +113,20 @@ When using YAML, you can also use the following types that are not supported by 
 - Functions: `!!js/function 'function () {...}'`
 - Undefined: `!!js/undefined ''`
 
-Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with environmental variables. These values are prefixed with **`options.envVarPrefix`**, which defaults to `APPSETTING_`; the prefix is then removed, the key is lowercased and converted to camelCase. You can also update a nested object by using a double underscore. For example:
+Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with an environmental variable. The variable `SMCONFIG` (name can be changed with **`options.envVarName`**) can contain a set of key-values, for example:
 
 ````sh
-# SMConfig will store 'Passw0rd' for the 'databaseConfiguration' key
-$ APPSETTING_DATABASE_PASSWORD=Passw0rd node myapp.js
+# SMConfig will store 'Passw0rd' for the 'databasePassword' key
+SMCONFIG="databasePassword=Passw0rd" node myapp.js
 
-# You can use a custom prefix by changing envVarPrefix,
-# for example to CUSTOMPREFIX_
-$ CUSTOMPREFIX_DATABASE_PASSWORD=Passw0rd node myapp.js
+# Nested properties can be passed too, for example `database.password`
+SMCONFIG="database.password=Passw0rd" node myapp.js
 
-# You can update a nested object, for example oauth.secretKe, using double udnerscores
-$ APPSETTING_OAUTH__SECRET_KEY=Secr3t node myapp.js
+# Multiple values can be passed
+SMCONFIG="database.password=Passw0rd database.username=admin" node myapp.js
+
+# If the value contains a space, quote it
+SMCONFIG="passphrase='hello world'" node myapp.js
 ````
 
 When **`options.flatten`** is true, as per default value, the configuration data is also "flattened" into a dictionary that uses "dot notation". For example, imagine the following configuration:
@@ -166,10 +169,10 @@ console.log(config.all)
 
 ````js
 // config is an instance of SMConfig
-let databasePassword = config.get('databasePassword')
+const databasePassword = config.get('databasePassword')
 
 // If options.flatten is true, you can also access "nested" keys
-let nested = config.get('database.credentials.password')
+const nested = config.get('database.credentials.password')
 ````
 
 Returns the value for the key passed as argument, reading from the configuration for the environment.
@@ -178,7 +181,7 @@ Returns the value for the key passed as argument, reading from the configuration
 
 ````js
 // config is an instance of SMConfig
-let env = config.environment
+const env = config.environment
 ````
 
 The **`environment`** property, which is read-only, contains the name of the environment being used by the application.
@@ -187,7 +190,7 @@ The **`environment`** property, which is read-only, contains the name of the env
 
 ````js
 // config is an instance of SMConfig
-let allConfiguration = config.all
+const allConfiguration = config.all
 ````
 
 The **`all`** property, which is read-only, contains all the configuration variables for the current environment.

@@ -7,6 +7,8 @@ const hjson = require('hjson')
 const lodashMerge = require('lodash.merge')
 const SMHelper = require('smhelper')
 
+const parseEnvVar = require('./lib/parseEnvVar')
+
 /**
  * Environment and configuration utilities
  */
@@ -72,12 +74,12 @@ class SMConfig {
      * ````
      *
      * Configuration values can always be overridden at runtime by passing
-     * environmental variables to the application. To be considered, environmental
-     * variables must start with a prefix, configured with the
-     * **`options.envVarPrefix`** setting (default: `APPSETTING_`) Environmental
-     * variables are lowercased then converted to camelCase, for example
-     * `APPSETTING_SECRET_KEY` becomes `secretKey`. The double underscore can be used
-     * to pass nested options, so `APPSETTING_DB__PASSWORD` becomes `db.password`.
+     * environmental variables to the application. All values can be specified
+     * in a string with key-value pairs, in an environmental variable called
+     * `SMCONFIG` (name can be changed with the **`options.envVarName`**
+     * setting). Multiple key-value pairs can be passed in the same variable,
+     * separated by a space. If the value contains a space, quotes can be used
+     * to escape it.
      * Values passed via environmental variables are strings, but numeric ones
      * (those representing a number) are converted to numbers.
      *
@@ -93,7 +95,7 @@ class SMConfig {
      * @param {Object|string} config - Configuration params or filename to load
      * @param {string} [env=default] - Force a specific environment
      * @param {object} [options] - Advanced options dictionary
-     * @param {string} [options.envVarPrefix=APPSETTING_] - Prefix for Environmental
+     * @param {string} [options.envVarName=SMCONFIG] - Prefix for Environmental
      * variables
      * @param {boolean} [options.flatten=true] - When true, configuration object is
      * also flatened to "dot notation"
@@ -109,7 +111,7 @@ class SMConfig {
 
         // Defaults for the options parameter
         options = Object.assign({
-            envVarPrefix: 'APPSETTING_',
+            envVarName: 'SMCONFIG',
             flatten: true
         }, options)
 
@@ -132,11 +134,11 @@ class SMConfig {
             throw Error('Cannot find default environment configuration in config parameter')
         }
 
-        // Sanitize envVarPrefix
-        if (!options.envVarPrefix) {
-            throw Error('envVarPrefix option must not be empty')
+        // Sanitize envVarName
+        if (!options.envVarName) {
+            throw Error('envVarName option must not be empty')
         }
-        options.envVarPrefix = SMHelper.toStringSafe(options.envVarPrefix)
+        options.envVarName = SMHelper.toStringSafe(options.envVarName)
 
         // Get the name of the current environment
         this._environment = this._getEnvironment(env, configData.hostnames)
@@ -147,7 +149,10 @@ class SMConfig {
             : {}
 
         // Lastly, load configuration from environmental variables
-        const envVars = this._loadEnvironmentalVariables(options.envVarPrefix)
+        let envVars = {}
+        if (process.env && process.env[options.envVarName]) {
+            envVars = parseEnvVar(process.env[options.envVarName])
+        }
 
         // Merge all the configuration, in order of priority:
         // 1. Runtime environmental variables
@@ -273,41 +278,6 @@ class SMConfig {
 
         // 4. Fallback to the default environment
         return 'default'
-    }
-
-    // Load additional configuration from environmental variables
-    _loadEnvironmentalVariables(envVarPrefix) {
-        const result = {}
-
-        // Loop through environmental variables that can override configuration
-        for (const key in process.env) {
-            /* istanbul ignore else */
-            if (process.env.hasOwnProperty(key)) {
-                // String.startsWith is available only in Node 6+
-                if (key.substr(0, envVarPrefix.length) === envVarPrefix) {
-                    // The double underscore can be used to get to nested objects
-                    // Then convert the key to camelCase
-                    const updateKey = key
-                        .substr(envVarPrefix.length)
-                        .split('__')
-                        .map((str) => {
-                            return SMHelper.stringToCamel(str.toLowerCase())
-                        })
-                        .join('.')
-
-                    // Check if value is a numeric string, then convert to number (float)
-                    let value = process.env[key]
-                    if (SMHelper.isNumeric(value)) {
-                        value = parseFloat(value)
-                    }
-
-                    // Update the nested object
-                    SMHelper.updatePropertyInObject(result, updateKey, value)
-                }
-            }
-        }
-
-        return result
     }
 }
 

@@ -8,9 +8,9 @@ const os = require('os')
 const SMConfig = require('../index')
 const SMHelper = require('smhelper')
 
-describe('SMConfig.js', () => {
+describe('SMConfig.js', function() {
 
-    it('SMConfig should export a class', () => {
+    it('SMConfig should export a class', function() {
         SMConfig.should.be.type('function')
         SMConfig.prototype.should.be.type('object')
 
@@ -22,7 +22,7 @@ describe('SMConfig.js', () => {
         config.get.should.be.type('function')
     })
 
-    describe('Constructor method', () => {
+    describe('Constructor method', function() {
         let originalEnv
 
         // Sample configuration object
@@ -115,7 +115,7 @@ describe('SMConfig.js', () => {
             process.env = originalEnv
         })
 
-        it('Configuration object', () => {
+        it('Configuration object', function() {
             // Parameter config not present
             assert.throws(() => {
                 new SMConfig()
@@ -141,14 +141,14 @@ describe('SMConfig.js', () => {
             assert.ok(config)
         })
 
-        it('Options parameter', () => {
+        it('Options parameter', function() {
             // Options parameter is not a dictionary
             assert.throws(() => {
                 new SMConfig({default: {}}, 'default', 'invalid')
             })
         })
 
-        it('Environment: fallback to default', () => {
+        it('Environment: fallback to default', function() {
             // Remove process.env.NODE_ENV if present
             delete process.env.NODE_ENV
 
@@ -204,7 +204,7 @@ describe('SMConfig.js', () => {
             assert.equal(config.environment, 'hostenv')
         })
 
-        it('Environment: use NODE_ENV environmental variable', () => {
+        it('Environment: use NODE_ENV environmental variable', function() {
             // Note: in this test, process.hostname.hostenv should still be set
             // and it should be overridden
 
@@ -218,7 +218,7 @@ describe('SMConfig.js', () => {
             delete process.env.NODE_ENV
         })
 
-        it('Environment: passing environment to constructor', () => {
+        it('Environment: passing environment to constructor', function() {
             // Note: in this test, process.hostname.hostenv and NODE_ENV are still set,
             // but should both be overridden
 
@@ -226,17 +226,17 @@ describe('SMConfig.js', () => {
             assert.equal(config.environment, 'passedenv')
         })
 
-        it('Configuration: load default configuration', () => {
+        it('Configuration: load default configuration', function() {
             const config = new SMConfig(params, 'nonexisting')
             assert.deepStrictEqual(config.all, defaultExpect)
         })
 
-        it('Configuration: do not flatten configuration', () => {
+        it('Configuration: do not flatten configuration', function() {
             const config = new SMConfig(params, 'nonexisting', {flatten: false})
             assert.deepStrictEqual(config.all, params.default)
         })
 
-        it('Configuration: load configuration for specific environment', () => {
+        it('Configuration: load configuration for specific environment', function() {
             let config
 
             config = new SMConfig(params, 'testenv1')
@@ -247,10 +247,13 @@ describe('SMConfig.js', () => {
             assert.deepStrictEqual(config.all, testenv2Expect)
         })
 
-        it('Configuration: overwrite at runtime with environmental variables', () => {
-            process.env.APPSETTING_WHEN = 'runtime' // New
-            process.env.APPSETTING_FIRST = 'overwrite' // Overwrite
-            process.env.APPSETTING_INT_NUM = '-8' // camelCase
+        it('Configuration: overwrite at runtime with environmental variables', function() {
+            const envParams = [
+                'when=runtime', // New
+                'first=overwrite', // Overwrite
+                'intNum=-8' // Int
+            ]
+            process.env.SMCONFIG = envParams.join(' ')
 
             const expect = SMHelper.cloneObject(testenv2Expect)
             expect.when = 'runtime'
@@ -261,116 +264,117 @@ describe('SMConfig.js', () => {
             assert.deepStrictEqual(config.all, expect)
 
             // Cleanup
-            delete process.env.APPSETTING_WHEN
-            delete process.env.APPSETTING_FIRST
-            delete process.env.APPSETTING_INT_NUM
+            delete process.env.SMCONFIG
         })
 
-        it('Configuration: overwrite at runtime with environmental variables (nested)', () => {
-            process.env.APPSETTING_OBJ__Z = 'New' // New
-            process.env.APPSETTING_OBJ__X = 'overwrite' // Overwrite
-            process.env.APPSETTING_OBJ__CAMEL_CASE = '-8' // camelCase
+        it('Configuration: overwrite at runtime with environmental variables (nested)', function() {
+            const envParams = [
+                'obj.z=New', // New
+                'obj.x=overwrite', // Overwrite
+                'obj.intNum=-8' // Int
+            ]
+            process.env.SMCONFIG = envParams.join(' ')
 
             const expect = SMHelper.cloneObject(testenv2Expect)
             expect.obj.z = 'New'
             expect.obj.x = 'overwrite'
-            expect.obj.camelCase = -8
+            expect.obj.intNum = -8
             expect['obj.z'] = 'New'
             expect['obj.x'] = 'overwrite'
-            expect['obj.camelCase'] = -8
+            expect['obj.intNum'] = -8
 
             const config = new SMConfig(params, 'testenv2')
             assert.deepStrictEqual(config.all, expect)
 
             // Cleanup
-            delete process.env.APPSETTING_OBJ__Z
-            delete process.env.APPSETTING_OBJ__X
-            delete process.env.APPSETTING_OBJ__CAMEL_CASE
+            delete process.env.SMCONFIG
         })
 
-        it('Configuration: overwrite at runtime with environmental variables (custom prefix)', () => {
-            process.env.SET_WHEN = 'runtime-again' // New
-            process.env.SET_FOO = 'overwrite-2' // Overwrite
-            process.env.SET_SOME_FLOAT = '19.91' // camelCase
+        it('Configuration: overwrite at runtime with environmental variables (custom var name)', function() {
+            const envParams = [
+                'when=runtime-again', // New
+                'foo=overwrite-2', // Overwrite
+                'someFloat=19.91' // Number
+            ]
+            process.env.CONF = envParams.join(' ')
 
             const expect = SMHelper.cloneObject(defaultExpect)
             expect.when = 'runtime-again'
             expect.foo = 'overwrite-2'
             expect.someFloat = 19.91
 
-            const config = new SMConfig(params, 'default', {envVarPrefix: 'SET_'})
+            const config = new SMConfig(params, 'default', {envVarName: 'CONF'})
             assert.deepStrictEqual(config.all, expect)
 
             // Cleanup
-            delete process.env.SET_WHEN
-            delete process.env.SET_FOO
-            delete process.env.SET_SOME_FLOAT
+            delete process.env.CONF
         })
 
-        it('Configuration: overwrite at runtime with environmental variables (invalid prefix)', () => {
+        it('Configuration: overwrite at runtime with environmental variables (invalid var name)', function() {
             assert.throws(() => {
-                new SMConfig(params, 'default', {envVarPrefix: ''})
+                new SMConfig(params, 'default', {envVarName: ''})
             }, /empty/)
         })
 
-        it('Configuration: file does not exist', () => {
+        it('Configuration: file does not exist', function() {
             assert.throws(() => {
                 new SMConfig('test/not-found.json')
             }, /exist|found/)
         })
 
-        it('Configuration: unrecognized format', () => {
+        it('Configuration: unrecognized format', function() {
             assert.throws(() => {
                 new SMConfig('test/resources/invalid-format.txt')
             }, /file format/)
         })
 
-        it('Configuration: load from JSON file', () => {
-            // Use another prefix for env vars so the ones set before are ignored
-            const config = new SMConfig('test/resources/testconfig.json', 'testenv2', {envVarPrefix: 'NOTHING_'})
+        it('Configuration: load from JSON file', function() {
+            // Use another env var name so the env vars set before are ignored
+            const config = new SMConfig('test/resources/testconfig.json', 'testenv2', {envVarName: 'NOTHINGHERE'})
             assert.deepStrictEqual(config.all, testenv2Expect)
         })
 
-        it('Configuration: load from YAML file', () => {
-            // Use another prefix for env vars so the ones set before are ignored
-            const config = new SMConfig('test/resources/testconfig.yaml', 'testenv2', {envVarPrefix: 'NOTHING_'})
+        it('Configuration: load from YAML file', function() {
+            // Use another env var name so the env vars set before are ignored
+            const config = new SMConfig('test/resources/testconfig.yaml', 'testenv2', {envVarName: 'NOTHINGHERE'})
             assert.deepStrictEqual(config.all, testenv2Expect)
         })
 
-        it('Configuration: load from Hjson file', () => {
-            // Use another prefix for env vars so the ones set before are ignored
-            const config = new SMConfig('test/resources/testconfig.hjson', 'testenv2', {envVarPrefix: 'NOTHING_'})
+        it('Configuration: load from Hjson file', function() {
+            // Use another env var name so the env vars set before are ignored
+            const config = new SMConfig('test/resources/testconfig.hjson', 'testenv2', {envVarName: 'NOTHINGHERE'})
             assert.deepStrictEqual(config.all, testenv2Expect)
         })
     })
 
-    describe('Object methods', () => {
-        it('SMConfig.environment should return environment name', () => {
+    describe('Object methods', function() {
+
+        it('SMConfig.environment should return environment name', function() {
             const config = new SMConfig({default: {}}, 'myenv')
             assert.strictEqual(config.environment, 'myenv')
         })
 
-        it('SMConfig.environment should be read-only', () => {
+        it('SMConfig.environment should be read-only', function() {
             const config = new SMConfig({default: {}}, 'myenv')
             assert.throws(() => {
                 config.environment = 'newenv'
             }, /TypeError/)
         })
 
-        it('SMConfig.all should return all configuration options', () => {
-            // Use another prefix for env vars so the ones set before are ignored
-            const config = new SMConfig({default: {a: 1}, myenv: {b: 2}}, 'myenv', {envVarPrefix: 'NOTHING_'})
+        it('SMConfig.all should return all configuration options', function() {
+            // Use another env var name so the env vars set before are ignored
+            const config = new SMConfig({default: {a: 1}, myenv: {b: 2}}, 'myenv', {envVarName: 'NOTHINGHERE'})
             assert.deepStrictEqual(config.all, {a: 1, b: 2})
         })
 
-        it('SMConfig.all should be read-only', () => {
+        it('SMConfig.all should be read-only', function() {
             const config = new SMConfig({default: {}}, 'myenv')
             assert.throws(() => {
                 config.all = {hello: 'world'}
             }, /TypeError/)
         })
 
-        it('SMConfig.get should return value for configuration key', () => {
+        it('SMConfig.get should return value for configuration key', function() {
             // Use another prefix for env vars so the ones set before are ignored
             const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar']}}, 'myenv', {envVarPrefix: 'NOTHING_'})
             assert.deepStrictEqual(config.get('a'), 1)
@@ -383,4 +387,5 @@ describe('SMConfig.js', () => {
             }, /non-empty string/i)
         })
     })
+    
 })
