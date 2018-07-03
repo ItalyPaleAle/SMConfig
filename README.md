@@ -113,20 +113,30 @@ When using YAML, you can also use the following types that are not supported by 
 - Functions: `!!js/function 'function () {...}'`
 - Undefined: `!!js/undefined ''`
 
-Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with an environmental variable. The variable `SMCONFIG` (name can be changed with **`options.envVarName`**) can contain a set of key-values, for example:
+Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with an environmental variable. The variable `SMCONFIG` (name can be changed with **`options.envVarName`**) can contain a set of key-values. You can also append `_1`, `_2`, etc, to pass multiple environmental variables. For example:
 
 ````sh
 # SMConfig will store 'Passw0rd' for the 'databasePassword' key
-SMCONFIG="databasePassword=Passw0rd" node myapp.js
+SMCONFIG="databasePassword=Passw0rd" \
+  node myapp.js
 
 # Nested properties can be passed too, for example `database.password`
-SMCONFIG="database.password=Passw0rd" node myapp.js
+SMCONFIG="database.password=Passw0rd" \
+  node myapp.js
 
 # Multiple values can be passed
-SMCONFIG="database.password=Passw0rd database.username=admin" node myapp.js
+SMCONFIG="database.password=Passw0rd database.username=admin" \
+  node myapp.js
 
 # If the value contains a space, quote it
-SMCONFIG="passphrase='hello world'" node myapp.js
+SMCONFIG="passphrase='hello world'" \
+  node myapp.js
+
+# You can add multiple environmental variable by appending `_#`
+SMCONFIG="passphrase='hello world'" \
+  SMCONFIG_1="hello=world" \
+  SMCONFIG_2="a=b" \
+  node myapp.js
 ````
 
 When **`options.flatten`** is true, as per default value, the configuration data is also "flattened" into a dictionary that uses "dot notation". For example, imagine the following configuration:

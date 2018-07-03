@@ -114,19 +114,6 @@ describe('SMConfig.js', function() {
             'obj.x': 1,
             'obj.y': 2
         }
-        const addendumEnvExpect = {
-            foo: 'bar',
-            hello: 'world',
-            number: 6,
-            ary: [0, 1, 1, 2, 3, 5, 8, 13, 21],
-            obj: {
-                x: 1,
-                y: 2
-            },
-            fruit: 'apricot',
-            'obj.x': 1,
-            'obj.y': 2
-        }
 
         // Current machine's hostname
         const currentHostname = os.hostname()
@@ -316,6 +303,35 @@ describe('SMConfig.js', function() {
             delete process.env.SMCONFIG
         })
 
+        it('Configuration: overwrite at runtime with multiple environmental variables', function() {
+            const envParams1 = [
+                'obj.z=New', // New
+                'obj.x=overwrite', // Overwrite
+                'obj.intNum=-8' // Int
+            ]
+            const envParams2 = [
+                'fruit=pear'
+            ]
+            process.env.SMCONFIG = envParams1.join(' ')
+            process.env.SMCONFIG_1 = envParams2.join(' ')
+
+            const expect = SMHelper.cloneObject(testenv2Expect)
+            expect.obj.z = 'New'
+            expect.obj.x = 'overwrite'
+            expect.obj.intNum = -8
+            expect.fruit = 'pear'
+            expect['obj.z'] = 'New'
+            expect['obj.x'] = 'overwrite'
+            expect['obj.intNum'] = -8
+
+            const config = new SMConfig(params, 'testenv2')
+            assert.deepStrictEqual(config.all, expect)
+
+            // Cleanup
+            delete process.env.SMCONFIG
+            delete process.env.SMCONFIG_1
+        })
+
         it('Configuration: overwrite at runtime with environmental variables (custom var name)', function() {
             const envParams = [
                 'when=runtime-again', // New
@@ -379,9 +395,12 @@ describe('SMConfig.js', function() {
         })
 
         it('Configuration: load multiple files, including a new env', function() {
+            const expect = SMHelper.cloneObject(addendumExpect)
+            expect.fruit = 'apricot'
+
             // Use another env var name so the env vars set before are ignored
             const config = new SMConfig(['test/resources/testconfig.json', 'test/resources/addendum.json'], 'addendum', {envVarName: 'NOTHINGHERE'})
-            assert.deepStrictEqual(config.all, addendumEnvExpect)
+            assert.deepStrictEqual(config.all, expect)
         })
 
         it('Configuration: load multiple files, with an invalid filename', function() {

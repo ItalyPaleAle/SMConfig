@@ -76,9 +76,10 @@ class SMConfig {
      * environmental variables to the application. All values can be specified
      * in a string with key-value pairs, in an environmental variable called
      * `SMCONFIG` (name can be changed with the **`options.envVarName`**
-     * setting). Multiple key-value pairs can be passed in the same variable,
-     * separated by a space. If the value contains a space, quotes can be used
-     * to escape it.
+     * setting). You can also append `_1`, `_2`, etc, to pass multiple
+     * environmental variables. Multiple key-value pairs can be passed in the
+     * same variable, separated by a space. If the value contains a space,
+     * quotes can be used to escape it.
      * Values passed via environmental variables are strings, but numeric ones
      * (those representing a number) are converted to numbers.
      *
@@ -164,8 +165,13 @@ class SMConfig {
 
         // Lastly, load configuration from environmental variables
         let envVars = {}
-        if (process.env && process.env[options.envVarName]) {
-            envVars = parseEnvVar(process.env[options.envVarName])
+        const matchExpression = new RegExp('^(' + options.envVarName + '|' + options.envVarName + '_[0-9]+)$')
+        if (process.env) {
+            for (const key in process.env) {
+                if (key.match(matchExpression)) {
+                    envVars = lodashMerge(envVars, parseEnvVar(process.env[key]))
+                }
+            }
         }
 
         // Merge all the configuration, in order of priority:
