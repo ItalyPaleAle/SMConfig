@@ -1,3 +1,4 @@
 fruit=cherry
 cake=0.33
-quote='la nebbia agl\'irti colli piovigginando sale'
+quote='la nebbia agl\'irti colli piovigginando sale' 
+obj.z="foo" 

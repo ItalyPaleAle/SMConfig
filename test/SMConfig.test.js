@@ -359,6 +359,8 @@ describe('SMConfig.js', function() {
             expect.fruit = 'cherry'
             expect.cake = 0.33
             expect.quote = 'la nebbia agl\'irti colli piovigginando sale'
+            expect.obj.z = 'foo'
+            expect['obj.z'] = 'foo'
 
             const config = new SMConfig(params, 'default')
             assert.deepStrictEqual(config.all, expect)
