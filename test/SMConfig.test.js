@@ -487,6 +487,18 @@ describe('SMConfig.js', function() {
             }, /TypeError/)
         })
 
+        it('SMConfig.all should return a cloned object', function() {
+            const config = new SMConfig({default: {a: 1, obj: {x: 1, y: 2}}, myenv: {b: 2}}, 'myenv', {envVarName: 'NOTHINGHERE', flatten: false})
+
+            // The returned object should be a clone, so editing a value in it shouldn't change the value in the SMConfig instance
+            const all = config.all
+            assert.deepStrictEqual(all, {a: 1, b: 2, obj: {x: 1, y: 2}})
+            all.a = -10
+            all.obj.x = -20
+            assert.deepStrictEqual(all, {a: -10, b: 2, obj: {x: -20, y: 2}})
+            assert.deepStrictEqual(config.all, {a: 1, b: 2, obj: {x: 1, y: 2}})
+        })
+
         it('SMConfig.get should return value for configuration key', function() {
             // Use another prefix for env vars so the ones set before are ignored
             const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar']}}, 'myenv', {envVarPrefix: 'NOTHING_'})
@@ -498,6 +510,16 @@ describe('SMConfig.js', function() {
             assert.throws(() => {
                 config.get(12)
             }, /non-empty string/i)
+        })
+
+        it('SMConfig.get should return a cloned object', function() {
+            // Use another prefix for env vars so the ones set before are ignored
+            const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar'],  obj: {x: 1, y: 2}}}, 'myenv', {envVarPrefix: 'NOTHING_', flatten: false})
+            const obj = config.get('obj')
+            assert.deepStrictEqual(obj,  {x: 1, y: 2})
+            obj.x = -10
+            assert.deepStrictEqual(obj,  {x: -10, y: 2})
+            assert.deepStrictEqual(config.get('obj'),  {x: 1, y: 2})
         })
     })
     

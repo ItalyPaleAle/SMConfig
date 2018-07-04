@@ -1,6 +1,7 @@
 'use strict'
 
 const lodashMerge = require('lodash.merge')
+const lodashCloneDeep = require('lodash.clonedeep')
 const SMHelper = require('smhelper')
 const fs = require('fs')
 
@@ -223,7 +224,8 @@ class SMConfig {
      * @type {Object}
      */
     get all() {
-        return this._config
+        // Return a clone of the object so it can't be modified
+        return lodashCloneDeep(this._config)
     }
 
     /**
@@ -235,7 +237,8 @@ class SMConfig {
         if (!key || typeof key != 'string') {
             throw Error('Parameter key must be a non-empty string')
         }
-        return this._config[key]
+        // Return a clone of the object so it can't be modified
+        return lodashCloneDeep(this._config[key])
     }
 }
 
