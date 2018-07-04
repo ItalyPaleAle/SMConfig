@@ -61,8 +61,7 @@
 <h2>Add to your project</h2><p>Install from NPM:</p>
 <pre class="prettyprint source lang-sh"><code>npm install --save smconfig</code></pre><h2>API Guide</h2><p>Include the module with:</p>
 <pre class="prettyprint source lang-js"><code>const SMConfig = require('smconfig')</code></pre><p>The module exports a class named <code>SMConfig</code>.</p>
-<h3>Constructor: SMConfig(config, env, options)</h3><pre class="prettyprint source lang-js"><code>const conf = new SMConfig(config, env, options)</code></pre><p>Parameters:</p>
-<ul>
+<h3>Constructor: SMConfig(config, env, options)</h3><pre class="prettyprint source lang-js"><code>const conf = new SMConfig(config, env, options)</code></pre><h4>Parameters</h4><ul>
 <li><code>config</code>: configuration object (read below for description)</li>
 <li><code>env</code>: when set, forces a specific environment</li>
 <li><code>options</code>: dictionary with options:<ul>
@@ -72,16 +71,9 @@
 </li>
 </ul>
 <p>The constructor determines the environment, then loads the configuration for the environment and stores it in the object.</p>
-<p>The environment is determined by, in order:</p>
-<ol>
-<li>The value passed to the <strong><code>env</code></strong> parameter</li>
-<li>The <code>process.env.NODE_ENV</code> environmental variable (when launching the application; for example: <code>$ NODE_ENV=production node myapp.js</code>)</li>
-<li>The environment that is configured for the hostname (see below)</li>
-<li>Fallback to the <code>default</code> environment</li>
-</ol>
-<p>The <strong><code>config</code></strong> paramter can either be a JavaScript object or the filename (as string) of a JSON, YAML or Hjson file. The file type is determined by the extension, and supported ones are: <code>*.json</code>, <code>*.yaml</code>, <code>*.yml</code> and <code>*.hjson</code>.</p>
+<h4>Config data</h4><p>The <strong><code>config</code></strong> paramter can either be a plain JavaScript object or the filename (as string) of a JSON, YAML or Hjson file. It is also possible to pass an array of filenames to load, which will be read in the sequence they are passed. File type is determined by the extension, and supported ones are: <code>*.json</code>, <code>*.yaml</code>, <code>*.yml</code> and <code>*.hjson</code>.</p>
 <p>The configuration object must have the following basic structure:</p>
-<pre class="prettyprint source lang-js"><code>const config = {
+<pre class="prettyprint source lang-js"><code>const configData = {
     // Default configuration, for all environments
     default: {
         key1: 'value1',
@@ -115,7 +107,15 @@
             /(.*?)\.example\.com$/i
         ]
     }
-}</code></pre><p>For sample configuration files in JSON, YAML and Hjson, check the documents in the test folder:</p>
+}
+
+// Example:
+const conf = new SMConfig(configData)</code></pre><h4>Load config data from files</h4><p>In place of a <code>config</code> object, you can pass a string with the path of a file to load with the config object. You can also pass an array of strings to specify multiple files, which will be merged in the order they're listed. If a configuration value is defined in multiple files, the value specified in the rightmost file will have the highest priority.</p>
+<pre class="prettyprint source lang-js"><code>// Load a file
+const obj = new SMConfig('config.json')
+
+// Load multiple files
+const obj = new SMConfig(['config.json', 'config2.yaml'])</code></pre><p>For sample configuration files in JSON, YAML and Hjson, check the documents in the test folder:</p>
 <ul>
 <li><a href="test/resources/testconfig.json">Sample JSON configuration</a></li>
 <li><a href="test/resources/testconfig.yaml">Sample YAML configuration</a></li>
@@ -127,18 +127,49 @@
 <li>Functions: <code>!!js/function 'function () {...}'</code></li>
 <li>Undefined: <code>!!js/undefined ''</code></li>
 </ul>
-<p>Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with an environmental variable. The variable <code>SMCONFIG</code> (name can be changed with <strong><code>options.envVarName</code></strong>) can contain a set of key-values, for example:</p>
+<h4>Using environmental variables</h4><p>Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with an environmental variable. The variable <code>SMCONFIG</code> (name can be changed with <strong><code>options.envVarName</code></strong>) can contain a set of key-values. You can also append <code>_1</code>, <code>_2</code>, etc, to pass multiple environmental variables. For example:</p>
 <pre class="prettyprint source lang-sh"><code># SMConfig will store 'Passw0rd' for the 'databasePassword' key
-SMCONFIG=&quot;databasePassword=Passw0rd&quot; node myapp.js
+SMCONFIG=&quot;databasePassword=Passw0rd&quot; \
+  node myapp.js
 
 # Nested properties can be passed too, for example `database.password`
-SMCONFIG=&quot;database.password=Passw0rd&quot; node myapp.js
+SMCONFIG=&quot;database.password=Passw0rd&quot; \
+  node myapp.js
 
 # Multiple values can be passed
-SMCONFIG=&quot;database.password=Passw0rd database.username=admin&quot; node myapp.js
+SMCONFIG=&quot;database.password=Passw0rd database.username=admin&quot; \
+  node myapp.js
+
+# You can add multiple environmental variable by appending `_#`
+SMCONFIG=&quot;passphrase='hello world'&quot; \
+  SMCONFIG_1=&quot;hello=world&quot; \
+  SMCONFIG_2=&quot;a=b&quot; \
+  node myapp.js
 
 # If the value contains a space, quote it
-SMCONFIG=&quot;passphrase='hello world'&quot; node myapp.js</code></pre><p>When <strong><code>options.flatten</code></strong> is true, as per default value, the configuration data is also &quot;flattened&quot; into a dictionary that uses &quot;dot notation&quot;. For example, imagine the following configuration:</p>
+SMCONFIG_1=&quot;passphrase='hello world'&quot; \
+  SMCONFIG_2=&quot;secret=\&quot;psshhh\&quot;&quot; \
+  node myapp.js</code></pre><p>You can also use the <code>SMCONFIG_FILE</code> (or <code>options.envVarName + '_FILE'</code>) to load a file with a list of values expressed as environmental variables. This is the same format of &quot;.env&quot; files, and can be used with <strong>Docker secrets</strong> as well.</p>
+<p>A &quot;.env&quot; file has a list of config values expressed as <code>key=value</code>, separated by spacing characters (e.g. spaces or newlines). You can use single or double quotes to escape characters. Comments are not supported</p>
+<p>Example of a &quot;.env&quot; file:</p>
+<pre class="prettyprint source lang-text"><code>hello=world
+quotes=&quot;required when using spaces&quot;
+escape='it\'s my life'
+nested.value=&quot;updated value in a nested object&quot;</code></pre><p>Example of loading the file:</p>
+<pre class="prettyprint source lang-sh"><code># Loading the .env file
+SMCONFIG_FILE=&quot;path/to/.env&quot; \
+  node myapp.js
+
+# This can be used with Docker secrets too
+SMCONFIG_FILE=&quot;/run/secrets/env&quot; \
+  node myapp.js</code></pre><h4>Environment</h4><p>The environment is determined by, in order:</p>
+<ol>
+<li>The value passed to the <strong><code>env</code></strong> parameter</li>
+<li>The <code>process.env.NODE_ENV</code> environmental variable (when launching the application; for example: <code>$ NODE_ENV=production node myapp.js</code>)</li>
+<li>The environment that is configured for the hostname (see below)</li>
+<li>Fallback to the <code>default</code> environment</li>
+</ol>
+<h4>Flatten array</h4><p>When <strong><code>options.flatten</code></strong> is true, as per default value, the configuration data is also &quot;flattened&quot; into a dictionary that uses &quot;dot notation&quot;. For example, imagine the following configuration:</p>
 <pre class="prettyprint source lang-js"><code>console.log(config.all)
 
 // Output when

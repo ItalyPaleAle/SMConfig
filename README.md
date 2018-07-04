@@ -42,7 +42,7 @@ The module exports a class named `SMConfig`.
 const conf = new SMConfig(config, env, options)
 ````
 
-Parameters:
+#### Parameters
 
 - `config`: configuration object (read below for description)
 - `env`: when set, forces a specific environment
@@ -52,19 +52,14 @@ Parameters:
 
 The constructor determines the environment, then loads the configuration for the environment and stores it in the object.
 
-The environment is determined by, in order:
-
-1. The value passed to the **`env`** parameter
-2. The `process.env.NODE_ENV` environmental variable (when launching the application; for example: `$ NODE_ENV=production node myapp.js`)
-3. The environment that is configured for the hostname (see below)
-4. Fallback to the `default` environment
+#### Config data
 
 The **`config`** paramter can either be a plain JavaScript object or the filename (as string) of a JSON, YAML or Hjson file. It is also possible to pass an array of filenames to load, which will be read in the sequence they are passed. File type is determined by the extension, and supported ones are: `*.json`, `*.yaml`, `*.yml` and `*.hjson`.
 
 The configuration object must have the following basic structure:
 
 ````js
-const config = {
+const configData = {
     // Default configuration, for all environments
     default: {
         key1: 'value1',
@@ -99,6 +94,21 @@ const config = {
         ]
     }
 }
+
+// Example:
+const conf = new SMConfig(configData)
+````
+
+#### Load config data from files
+
+In place of a `config` object, you can pass a string with the path of a file to load with the config object. You can also pass an array of strings to specify multiple files, which will be merged in the order they're listed. If a configuration value is defined in multiple files, the value specified in the rightmost file will have the highest priority.
+
+````js
+// Load a file
+const obj = new SMConfig('config.json')
+
+// Load multiple files
+const obj = new SMConfig(['config.json', 'config2.yaml'])
 ````
 
 For sample configuration files in JSON, YAML and Hjson, check the documents in the test folder:
@@ -112,6 +122,8 @@ When using YAML, you can also use the following types that are not supported by 
 - RegExp: `!!js/regexp /pattern/gim`
 - Functions: `!!js/function 'function () {...}'`
 - Undefined: `!!js/undefined ''`
+
+#### Using environmental variables
 
 Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with an environmental variable. The variable `SMCONFIG` (name can be changed with **`options.envVarName`**) can contain a set of key-values. You can also append `_1`, `_2`, etc, to pass multiple environmental variables. For example:
 
@@ -128,16 +140,53 @@ SMCONFIG="database.password=Passw0rd" \
 SMCONFIG="database.password=Passw0rd database.username=admin" \
   node myapp.js
 
-# If the value contains a space, quote it
-SMCONFIG="passphrase='hello world'" \
-  node myapp.js
-
 # You can add multiple environmental variable by appending `_#`
 SMCONFIG="passphrase='hello world'" \
   SMCONFIG_1="hello=world" \
   SMCONFIG_2="a=b" \
   node myapp.js
+
+# If the value contains a space, quote it
+SMCONFIG_1="passphrase='hello world'" \
+  SMCONFIG_2="secret=\"psshhh\"" \
+  node myapp.js
 ````
+
+You can also use the `SMCONFIG_FILE` (or `options.envVarName + '_FILE'`) to load a file with a list of values expressed as environmental variables. This is the same format of ".env" files, and can be used with **Docker secrets** as well.
+
+A ".env" file has a list of config values expressed as `key=value`, separated by spacing characters (e.g. spaces or newlines). You can use single or double quotes to escape characters. Comments are not supported
+
+Example of a ".env" file:
+
+````text
+hello=world
+quotes="required when using spaces"
+escape='it\'s my life'
+nested.value="updated value in a nested object"
+````
+
+Example of loading the file:
+
+````sh
+# Loading the .env file
+SMCONFIG_FILE="path/to/.env" \
+  node myapp.js
+
+# This can be used with Docker secrets too
+SMCONFIG_FILE="/run/secrets/env" \
+  node myapp.js
+````
+
+#### Environment
+
+The environment is determined by, in order:
+
+1. The value passed to the **`env`** parameter
+2. The `process.env.NODE_ENV` environmental variable (when launching the application; for example: `$ NODE_ENV=production node myapp.js`)
+3. The environment that is configured for the hostname (see below)
+4. Fallback to the `default` environment
+
+#### Flatten array
 
 When **`options.flatten`** is true, as per default value, the configuration data is also "flattened" into a dictionary that uses "dot notation". For example, imagine the following configuration:
 

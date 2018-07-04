@@ -55,16 +55,10 @@
 <div class="description">
     <p>Initializes the class, determining the environment, then
 loading the configuration for the environment and storing it in the object.</p>
-<p>The environment is determined by, in order:</p>
-<ol>
-<li>The value passed to the <strong><code>env</code></strong> parameter</li>
-<li>The <code>NODE_ENV</code> environmental variable</li>
-<li>The environment that is configured for the hostname</li>
-<li>Fallback to the <code>default</code> environment</li>
-</ol>
 <p>The <strong><code>config</code></strong> parameter can be an object with the configuration values,
-or a string representing a JSON/YAML/Hjson file to load. File type is
-determined by the extension: <em>.json, </em>.yml/<em>.yaml, </em>.hjson</p>
+or a string representing a JSON/YAML/Hjson file to load. It is also possible
+to pass an array of filenames to load, which will be read in the sequence they
+are passed. File type is determined by the extension: json, yml, yaml, hjson</p>
 <p>When using YAML files, you can also represent additional JavaScript
 typtes that are not allowed by JSON and Hjson:</p>
 <ul>
@@ -111,13 +105,25 @@ typtes that are not allowed by JSON and Hjson:</p>
 environmental variables to the application. All values can be specified
 in a string with key-value pairs, in an environmental variable called
 <code>SMCONFIG</code> (name can be changed with the <strong><code>options.envVarName</code></strong>
-setting). Multiple key-value pairs can be passed in the same variable,
-separated by a space. If the value contains a space, quotes can be used
-to escape it.
+setting). You can also append <code>_1</code>, <code>_2</code>, etc, to pass multiple
+environmental variables. Multiple key-value pairs can be passed in the
+same variable, separated by a space. If the value contains a space,
+quotes can be used to escape it.
+It's possible to load environmental variables from a &quot;.env&quot; file by
+specifying the file path in the <code>SMCONFIG_FILE</code>
+(or <code>options.envVarName + '_FILE'</code>) variable. This can be used with
+Docker secrets too, when the path is in <code>/run/secrets</code>.
 Values passed via environmental variables are strings, but numeric ones
 (those representing a number) are converted to numbers.</p>
 <p>Values in the hostnames array can be RegExp objects or strings. Strings are
 parsed using <code>SMHelper.strIs</code>, so the <code>*</code> token can be used as wildcard.</p>
+<p>The environment is determined by, in order:</p>
+<ol>
+<li>The value passed to the <strong><code>env</code></strong> parameter</li>
+<li>The <code>NODE_ENV</code> environmental variable</li>
+<li>The environment that is configured for the hostname</li>
+<li>Fallback to the <code>default</code> environment</li>
+</ol>
 <p>When <strong><code>options.flatten</code></strong> is true, as per default value, the configuration
 data is also &quot;flattened&quot; into a dictionary that uses &quot;dot notation&quot;. This
 is done with <code>SMHelper.objectToDotNotation</code>. By &quot;flattening&quot; the dictionary,
@@ -172,6 +178,9 @@ as in <code>config.get('database.credentials.password')</code>.</p>
 |
 
 <span class="param-type">string</span>
+|
+
+<span class="param-type">Array.&lt;string></span>
 
 
             
@@ -193,7 +202,7 @@ as in <code>config.get('database.credentials.password')</code>.</p>
                 </td>
             
 
-            <td class="description last"><p>Configuration params or filename to load</p></td>
+            <td class="description last"><p>Configuration params or filename(s) to load</p></td>
         </tr>
 
     
@@ -420,7 +429,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line13">line 13</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line14">line 14</a>
     </li></ul></dd>
     
 
@@ -522,7 +531,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line183">line 183</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line225">line 225</a>
     </li></ul></dd>
     
 
@@ -594,7 +603,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line175">line 175</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line217">line 217</a>
     </li></ul></dd>
     
 
@@ -723,7 +732,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line192">line 192</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line234">line 234</a>
     </li></ul></dd>
     
 

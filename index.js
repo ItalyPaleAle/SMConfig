@@ -16,12 +16,6 @@ class SMConfig {
      * Initializes the class, determining the environment, then
      * loading the configuration for the environment and storing it in the object.
      *
-     * The environment is determined by, in order:
-     * 1. The value passed to the **`env`** parameter
-     * 2. The `NODE_ENV` environmental variable
-     * 3. The environment that is configured for the hostname
-     * 4. Fallback to the `default` environment
-     *
      * The **`config`** parameter can be an object with the configuration values,
      * or a string representing a JSON/YAML/Hjson file to load. It is also possible
      * to pass an array of filenames to load, which will be read in the sequence they
@@ -81,12 +75,23 @@ class SMConfig {
      * environmental variables. Multiple key-value pairs can be passed in the
      * same variable, separated by a space. If the value contains a space,
      * quotes can be used to escape it.
+     * It's possible to load environmental variables from a ".env" file by
+     * specifying the file path in the `SMCONFIG_FILE`
+     * (or `options.envVarName + '_FILE'`) variable. This can be used with
+     * Docker secrets too, when the path is in `/run/secrets`.
      * Values passed via environmental variables are strings, but numeric ones
      * (those representing a number) are converted to numbers.
      *
      * Values in the hostnames array can be RegExp objects or strings. Strings are
      * parsed using `SMHelper.strIs`, so the `*` token can be used as wildcard.
      *
+     * The environment is determined by, in order:
+     * 
+     * 1. The value passed to the **`env`** parameter
+     * 2. The `NODE_ENV` environmental variable
+     * 3. The environment that is configured for the hostname
+     * 4. Fallback to the `default` environment
+     * 
      * When **`options.flatten`** is true, as per default value, the configuration
      * data is also "flattened" into a dictionary that uses "dot notation". This
      * is done with `SMHelper.objectToDotNotation`. By "flattening" the dictionary,
