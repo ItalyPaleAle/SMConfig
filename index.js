@@ -2,6 +2,7 @@
 
 const lodashMerge = require('lodash.merge')
 const SMHelper = require('smhelper')
+const fs = require('fs')
 
 const parseEnvVar = require('./lib/parseEnvVar')
 const loadConfigFile = require('./lib/loadConfigFile')
@@ -166,9 +167,23 @@ class SMConfig {
         // Lastly, load configuration from environmental variables
         let envVars = {}
         const matchExpression = new RegExp('^(' + options.envVarName + '|' + options.envVarName + '_[0-9]+)$')
+        /* istanbul ignore else */
         if (process.env) {
             for (const key in process.env) {
-                if (key.match(matchExpression)) {
+                // Check if it's a filename with environments variables as content
+                if (key == options.envVarName + '_FILE') {
+                    // Read the file synchronously
+                    if (!fs.existsSync(process.env[key])) {
+                        throw Error('Cannot read file with environment variables: file doesn\'t exist')
+                    }
+                    const fileContent = fs.readFileSync(process.env[key], 'utf8')
+                    if (!fileContent) {
+                        throw Error('Cannot read file with environment variables: file is empty')
+                    }
+                    envVars = lodashMerge(envVars, parseEnvVar(fileContent))
+                }
+                // Check if it's a string SMCONFIG or SMCONFIG_n
+                else if (key.match(matchExpression)) {
                     envVars = lodashMerge(envVars, parseEnvVar(process.env[key]))
                 }
             }

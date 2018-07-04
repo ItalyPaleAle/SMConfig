@@ -352,6 +352,54 @@ describe('SMConfig.js', function() {
             delete process.env.CONF
         })
 
+        it('Configuration: env var file', function() {
+            process.env.SMCONFIG_FILE = 'test/resources/env'
+
+            const expect = SMHelper.cloneObject(defaultExpect)
+            expect.fruit = 'cherry'
+            expect.cake = 0.33
+            expect.quote = 'la nebbia agl\'irti colli piovigginando sale'
+
+            const config = new SMConfig(params, 'default')
+            assert.deepStrictEqual(config.all, expect)
+
+            // Cleanup
+            delete process.env.SMCONFIG_FILE
+        })
+        
+        it('Configuration: env var file does not exist', function() {
+            process.env.SMCONFIG_FILE = 'test/_notfound'
+
+            assert.throws(() => {
+                new SMConfig(params, 'default')
+            }, /file doesn't exist/i)
+
+            // Cleanup
+            delete process.env.SMCONFIG_FILE
+        })
+
+        it('Configuration: env var file is empty', function() {
+            process.env.SMCONFIG_FILE = 'test/resources/empty'
+
+            assert.throws(() => {
+                new SMConfig(params, 'default')
+            }, /file is empty/i)
+
+            // Cleanup
+            delete process.env.SMCONFIG_FILE
+        })
+
+        it('Configuration: env var file is malformed', function() {
+            process.env.SMCONFIG_FILE = 'test/resources/invalid-format.txt'
+
+            assert.throws(() => {
+                new SMConfig(params, 'default')
+            }, /malformed/i)
+
+            // Cleanup
+            delete process.env.SMCONFIG_FILE
+        })
+        
         it('Configuration: overwrite at runtime with environmental variables (invalid var name)', function() {
             assert.throws(() => {
                 new SMConfig(params, 'default', {envVarName: ''})
