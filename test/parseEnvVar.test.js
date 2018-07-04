@@ -48,6 +48,20 @@ describe('parseEnvVar', function() {
         assert.deepStrictEqual(test, expect)
     })
 
+    it('Ending with whitespace characters', function() {
+        const test = parseEnvVar('key.a=value hello=world help.me=yes\n \t')
+        const expect = {
+            key: {
+                a: 'value'
+            },
+            hello: 'world',
+            help: {
+                me: 'yes'
+            }
+        }
+        assert.deepStrictEqual(test, expect)
+    })
+
     it('Numeric values', function() {
         const test = parseEnvVar('key=value intNumber=8 negative=-12 float=-12.3')
         const expect = {
