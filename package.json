@@ -1,6 +1,6 @@
 {
   "name": "smconfig",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0",
   "description": "Application configuration module for Node.js",
   "main": "index.js",
   "directories": {
