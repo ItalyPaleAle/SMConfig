@@ -9,12 +9,11 @@ Application configuration module for Node.js.
 
 Features:
 
-- Simple APIs, using ES6 classes
-- Supports multiple environments
+- Simple, yet flexible APIs
 - Automatic environment detection based on hostname
-- Override configuration at runtime with environmental variables
-- Supports loading configuration from JSON, YAML and [Hjson](http://hjson.org) documents
-- Offers a plugin for Hapi
+- Override configuration at runtime with environmental variables or ".env" files
+- Load configuration from JSON, YAML and [Hjson](http://hjson.org) documents
+- Plugin for Hapi 17+
 
 This code is licensed under the terms of the MIT license (see LICENSE.md).
 
