@@ -132,7 +132,6 @@ describe('SMConfig test via shell', function() {
         expect.cake = 0.33
         expect.quote = 'la nebbia agl\'irti colli piovigginando sale'
         expect.obj.z = 'foo'
-        expect['obj.z'] = 'foo'
 
         const command = [
             'SMCONFIG_FILE=test/resources/env',

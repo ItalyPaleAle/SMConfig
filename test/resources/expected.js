@@ -44,9 +44,7 @@ const defaultExpect = {
     obj: {
         x: 1,
         y: 2
-    },
-    'obj.x': 1,
-    'obj.y': 2
+    }
 }
 
 const testenv1Expect = {
@@ -59,9 +57,6 @@ const testenv1Expect = {
         y: 2,
         z: 3
     },
-    'obj.x': 1,
-    'obj.y': 2,
-    'obj.z': 3,
     add: 'me'
 }
 
@@ -74,8 +69,6 @@ const testenv2Expect = {
         x: 1,
         y: 2
     },
-    'obj.x': 1,
-    'obj.y': 2,
     first: 'last'
 }
 
@@ -89,9 +82,7 @@ const addendumExpect = {
         x: 1,
         y: 2
     },
-    fruit: 'pear',
-    'obj.x': 1,
-    'obj.y': 2
+    fruit: 'pear'
 }
 
 module.exports = {

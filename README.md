@@ -46,8 +46,7 @@ const conf = new SMConfig(config, env, options)
 - `config`: configuration object (read below for description)
 - `env`: when set, forces a specific environment
 - `options`: dictionary with options:
-    - `options.envVarName`: name of the environmental variable where options are passed (default: `SMCONFIG`)
-    - `options.flatten`: when true, configuration object is also flatened to "dot notation" (default: true)
+  - `options.envVarName`: name of the environmental variable where options are passed (default: `SMCONFIG`)
 
 The constructor determines the environment, then loads the configuration for the environment and stores it in the object.
 
@@ -185,51 +184,13 @@ The environment is determined by, in order:
 3. The environment that is configured for the hostname (see below)
 4. Fallback to the `default` environment
 
-#### Flatten array
-
-When **`options.flatten`** is true, as per default value, the configuration data is also "flattened" into a dictionary that uses "dot notation". For example, imagine the following configuration:
-
-````js
-console.log(config.all)
-
-// Output when
-// options.flatten: false
-{
-    "database": {
-        "host": "db.example.com",
-        "username": "admin",
-        "password": "Passw0rd",
-        "ports": [8000, 8001]
-    },
-    "otherkey": "otherval"
-}
-
-// Output when
-// options.flatten: true
-{
-    "database": {
-        "host": "db.example.com",
-        "credentials": {
-            "username": "admin",
-            "password": "Passw0rd"
-        },
-        "ports": [8000, 8001]
-    },
-    "database.host": "db.example.com",
-    "database.credentials.username": "admin",
-    "database.credentials.password": "Passw0rd",
-    "database.ports": [8000, 8001],
-    "otherkey": "otherval"
-}
-````
-
 ### SMConfig.get(key)
 
 ````js
 // config is an instance of SMConfig
 const databasePassword = config.get('databasePassword')
 
-// If options.flatten is true, you can also access "nested" keys
+// You can access nested properties using the "dot notation"
 const nested = config.get('database.credentials.password')
 ````
 
