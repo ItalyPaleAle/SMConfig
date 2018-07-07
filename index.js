@@ -21,7 +21,7 @@ class SMConfig {
      * or a string representing a JSON/YAML/Hjson file to load, another instance of
      * SMConfig, or an array mixing those.
      * If multiple objects/files are passed, values are merged from left to right,
-     * so values defined on the right side will overwrite those defined on the left.
+     * so subsequent values overwrite property assignments of previous values.
      * File type is determined by the extension: json, yml, yaml, hjson.
      *
      * When using YAML files, you can also represent additional JavaScript

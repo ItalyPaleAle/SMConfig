@@ -65,13 +65,24 @@
 <li><code>env</code>: when set, forces a specific environment</li>
 <li><code>options</code>: dictionary with options:<ul>
 <li><code>options.envVarName</code>: name of the environmental variable where options are passed (default: <code>SMCONFIG</code>)</li>
-<li><code>options.flatten</code>: when true, configuration object is also flatened to &quot;dot notation&quot; (default: true)</li>
 </ul>
 </li>
 </ul>
 <p>The constructor determines the environment, then loads the configuration for the environment and stores it in the object.</p>
-<h4>Config data</h4><p>The <strong><code>config</code></strong> paramter can either be a plain JavaScript object or the filename (as string) of a JSON, YAML or Hjson file. It is also possible to pass an array of filenames to load, which will be read in the sequence they are passed. File type is determined by the extension, and supported ones are: <code>*.json</code>, <code>*.yaml</code>, <code>*.yml</code> and <code>*.hjson</code>.</p>
-<p>The configuration object must have the following basic structure:</p>
+<h4>Config data</h4><p>The <strong><code>config</code></strong> paramter can be:</p>
+<ul>
+<li>A plain JavaScript object, respecting the structure in the example below.</li>
+<li>The filename (as string) of a JSON, YAML or Hjson file. File type is determined by the extension, and supported ones are: <code>*.json</code>, <code>*.yaml</code>, <code>*.yml</code> and <code>*.hjson</code>. The content of the file must represent a structure like the one below.</li>
+<li>Another instance of SMConfig. In this case, the constructor will merge the content of <code>config.all</code> from the other object into the &quot;default&quot; section.</li>
+<li>An array mixing any of the above. In this case, data will be merged from left to right: subsequent values overwrite property assignments of previous values.</li>
+</ul>
+<h4>Config object structure</h4><p>The config object must have the following basic structure:</p>
+<ul>
+<li>The <code>default</code> key is always required, containing the default config values for all the environments.</li>
+<li>The <code>hostnames</code> key can be defined. This is a dictionary in which the key is the environment name, and the value is an array of possible hostnames to match (exact string matches, strings with wildcard matching using <code>*</code>, or regular expressions).</li>
+<li>Any other key represents the configuration for the environment named like the key. For example, you can define the configuration for the &quot;production&quot; environment in the <code>production</code> key, and that will inherit from the <code>default</code> configuration all values not specified.</li>
+</ul>
+<p>For example:</p>
 <pre class="prettyprint source lang-js"><code>const configData = {
     // Default configuration, for all environments
     default: {
@@ -92,7 +103,7 @@
     },
     otherenvironment: {},
 
-    // The hostnames object contains a list of hostnames that are
+    // The hostnames object contains a dictionary of hostnames that are
     // mapped to a specific environment.
     hostnames: {
         // Name of the environment, then list of hostnames
@@ -109,7 +120,7 @@
 }
 
 // Example:
-const conf = new SMConfig(configData)</code></pre><h4>Load config data from files</h4><p>In place of a <code>config</code> object, you can pass a string with the path of a file to load with the config object. You can also pass an array of strings to specify multiple files, which will be merged in the order they're listed. If a configuration value is defined in multiple files, the value specified in the rightmost file will have the highest priority.</p>
+const conf = new SMConfig(configData)</code></pre><h4>Load config data from files</h4><p>In place of a config object, you can pass a string with the path of a file to load with the config object.</p>
 <pre class="prettyprint source lang-js"><code>// Load a file
 const obj = new SMConfig('config.json')
 
@@ -168,41 +179,10 @@ SMCONFIG_FILE=&quot;/run/secrets/env&quot; \
 <li>The environment that is configured for the hostname (see below)</li>
 <li>Fallback to the <code>default</code> environment</li>
 </ol>
-<h4>Flatten array</h4><p>When <strong><code>options.flatten</code></strong> is true, as per default value, the configuration data is also &quot;flattened&quot; into a dictionary that uses &quot;dot notation&quot;. For example, imagine the following configuration:</p>
-<pre class="prettyprint source lang-js"><code>console.log(config.all)
-
-// Output when
-// options.flatten: false
-{
-    &quot;database&quot;: {
-        &quot;host&quot;: &quot;db.example.com&quot;,
-        &quot;username&quot;: &quot;admin&quot;,
-        &quot;password&quot;: &quot;Passw0rd&quot;,
-        &quot;ports&quot;: [8000, 8001]
-    },
-    &quot;otherkey&quot;: &quot;otherval&quot;
-}
-
-// Output when
-// options.flatten: true
-{
-    &quot;database&quot;: {
-        &quot;host&quot;: &quot;db.example.com&quot;,
-        &quot;credentials&quot;: {
-            &quot;username&quot;: &quot;admin&quot;,
-            &quot;password&quot;: &quot;Passw0rd&quot;
-        },
-        &quot;ports&quot;: [8000, 8001]
-    },
-    &quot;database.host&quot;: &quot;db.example.com&quot;,
-    &quot;database.credentials.username&quot;: &quot;admin&quot;,
-    &quot;database.credentials.password&quot;: &quot;Passw0rd&quot;,
-    &quot;database.ports&quot;: [8000, 8001],
-    &quot;otherkey&quot;: &quot;otherval&quot;
-}</code></pre><h3>SMConfig.get(key)</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
+<h3>SMConfig.get(key)</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
 const databasePassword = config.get('databasePassword')
 
-// If options.flatten is true, you can also access &quot;nested&quot; keys
+// You can access nested properties using the &quot;dot notation&quot;
 const nested = config.get('database.credentials.password')</code></pre><p>Returns the value for the key passed as argument, reading from the configuration for the environment.</p>
 <h3>SMConfig.environment</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
 const env = config.environment</code></pre><p>The <strong><code>environment</code></strong> property, which is read-only, contains the name of the environment being used by the application.</p>

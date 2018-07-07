@@ -71,31 +71,40 @@ function getEnvironment(env, hostnames) {
         const hostname = os.hostname()
 
         for (const e in hostnames) {
-            // Ensure the value is a non-empty array
-            /* istanbul ignore else */
-            if (hostnames.hasOwnProperty(e) &amp;&amp; hostnames[e] &amp;&amp; Array.isArray(hostnames[e])) {
-                // Iterate through the list of hostnames
-                for (const i in hostnames[e]) {
-                    const v = hostnames[e][i]
-                    if (!v) {
-                        continue
-                    }
+            /* istanbul ignore if */
+            if (!hostnames.hasOwnProperty(e)) {
+                continue
+            }
 
-                    if (typeof v == 'string') {
-                        // Value is a string
-                        if (SMHelper.strIs(v, hostname)) {
-                            // Return the value from the function
-                            return e
-                        }
+            // Ensure the value is a non-empty array, or ignore this
+            if (!hostnames[e] || !Array.isArray(hostnames[e]) || !hostnames[e].length) {
+                continue
+            }
+
+            // Iterate through the list of hostnames
+            for (const i in hostnames[e]) {
+                const v = hostnames[e][i]
+                if (!v) {
+                    continue
+                }
+
+                if (typeof v == 'string') {
+                    // Value is a string
+                    if (SMHelper.strIs(v, hostname)) {
+                        // Return the value from the function
+                        return e
                     }
-                    /* istanbul ignore else */
-                    else if (v instanceof RegExp) {
-                        // Value is a RegExp
-                        if (v.test(hostname)) {
-                            // Return the value from the function
-                            return e
-                        }
+                }
+                else if (v instanceof RegExp) {
+                    // Value is a RegExp
+                    if (v.test(hostname)) {
+                        // Return the value from the function
+                        return e
                     }
+                }
+                else {
+                    // Ignore invalid values
+                    continue
                 }
             }
         }

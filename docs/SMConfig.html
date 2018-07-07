@@ -56,9 +56,11 @@
     <p>Initializes the class, determining the environment, then
 loading the configuration for the environment and storing it in the object.</p>
 <p>The <strong><code>config</code></strong> parameter can be an object with the configuration values,
-or a string representing a JSON/YAML/Hjson file to load. It is also possible
-to pass an array of filenames to load, which will be read in the sequence they
-are passed. File type is determined by the extension: json, yml, yaml, hjson</p>
+or a string representing a JSON/YAML/Hjson file to load, another instance of
+SMConfig, or an array mixing those.
+If multiple objects/files are passed, values are merged from left to right,
+so subsequent values overwrite property assignments of previous values.
+File type is determined by the extension: json, yml, yaml, hjson.</p>
 <p>When using YAML files, you can also represent additional JavaScript
 typtes that are not allowed by JSON and Hjson:</p>
 <ul>
@@ -124,11 +126,6 @@ parsed using <code>SMHelper.strIs</code>, so the <code>*</code> token can be use
 <li>The environment that is configured for the hostname</li>
 <li>Fallback to the <code>default</code> environment</li>
 </ol>
-<p>When <strong><code>options.flatten</code></strong> is true, as per default value, the configuration
-data is also &quot;flattened&quot; into a dictionary that uses &quot;dot notation&quot;. This
-is done with <code>SMHelper.objectToDotNotation</code>. By &quot;flattening&quot; the dictionary,
-it's possible to use the <code>get()</code> method to retrieve nested properties, such
-as in <code>config.get('database.credentials.password')</code>.</p>
 </div>
 
 
@@ -174,13 +171,16 @@ as in <code>config.get('database.credentials.password')</code>.</p>
             <td class="type">
             
                 
+<span class="param-type">Array.&lt;Object, string, <a href="SMConfig.html">SMConfig</a>></span>
+|
+
 <span class="param-type">Object</span>
 |
 
 <span class="param-type">string</span>
 |
 
-<span class="param-type">Array.&lt;string></span>
+<span class="param-type"><a href="SMConfig.html">SMConfig</a></span>
 
 
             
@@ -254,7 +254,7 @@ as in <code>config.get('database.credentials.password')</code>.</p>
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Object</span>
 
 
             
@@ -342,46 +342,6 @@ as in <code>config.get('database.credentials.password')</code>.</p>
 
             <td class="description last"><p>Name of the environmental
        variable with options passed at runtime.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>flatten</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last"><p>When true, configuration object is
-also flatened to &quot;dot notation&quot;</p></td>
         </tr>
 
     
@@ -531,7 +491,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line226">line 226</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line220">line 220</a>
     </li></ul></dd>
     
 
@@ -603,7 +563,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line218">line 218</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line212">line 212</a>
     </li></ul></dd>
     
 
@@ -732,7 +692,7 @@ also flatened to &quot;dot notation&quot;</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line236">line 236</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line230">line 230</a>
     </li></ul></dd>
     
 

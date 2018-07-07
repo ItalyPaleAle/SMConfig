@@ -52,9 +52,22 @@ The constructor determines the environment, then loads the configuration for the
 
 #### Config data
 
-The **`config`** paramter can either be a plain JavaScript object or the filename (as string) of a JSON, YAML or Hjson file. It is also possible to pass an array of filenames to load, which will be read in the sequence they are passed. File type is determined by the extension, and supported ones are: `*.json`, `*.yaml`, `*.yml` and `*.hjson`.
+The **`config`** paramter can be:
 
-The configuration object must have the following basic structure:
+- A plain JavaScript object, respecting the structure in the example below.
+- The filename (as string) of a JSON, YAML or Hjson file. File type is determined by the extension, and supported ones are: `*.json`, `*.yaml`, `*.yml` and `*.hjson`. The content of the file must represent a structure like the one below.
+- Another instance of SMConfig. In this case, the constructor will merge the content of `config.all` from the other object into the "default" section.
+- An array mixing any of the above. In this case, data will be merged from left to right: subsequent values overwrite property assignments of previous values.
+
+#### Config object structure
+
+The config object must have the following basic structure:
+
+- The `default` key is always required, containing the default config values for all the environments.
+- The `hostnames` key can be defined. This is a dictionary in which the key is the environment name, and the value is an array of possible hostnames to match (exact string matches, strings with wildcard matching using `*`, or regular expressions).
+- Any other key represents the configuration for the environment named like the key. For example, you can define the configuration for the "production" environment in the `production` key, and that will inherit from the `default` configuration all values not specified.
+
+For example:
 
 ````js
 const configData = {
@@ -77,7 +90,7 @@ const configData = {
     },
     otherenvironment: {},
 
-    // The hostnames object contains a list of hostnames that are
+    // The hostnames object contains a dictionary of hostnames that are
     // mapped to a specific environment.
     hostnames: {
         // Name of the environment, then list of hostnames
@@ -99,7 +112,7 @@ const conf = new SMConfig(configData)
 
 #### Load config data from files
 
-In place of a `config` object, you can pass a string with the path of a file to load with the config object. You can also pass an array of strings to specify multiple files, which will be merged in the order they're listed. If a configuration value is defined in multiple files, the value specified in the rightmost file will have the highest priority.
+In place of a config object, you can pass a string with the path of a file to load with the config object.
 
 ````js
 // Load a file

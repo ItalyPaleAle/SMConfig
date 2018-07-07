@@ -46,9 +46,11 @@ class SMConfig {
      * loading the configuration for the environment and storing it in the object.
      *
      * The **`config`** parameter can be an object with the configuration values,
-     * or a string representing a JSON/YAML/Hjson file to load. It is also possible
-     * to pass an array of filenames to load, which will be read in the sequence they
-     * are passed. File type is determined by the extension: json, yml, yaml, hjson
+     * or a string representing a JSON/YAML/Hjson file to load, another instance of
+     * SMConfig, or an array mixing those.
+     * If multiple objects/files are passed, values are merged from left to right,
+     * so subsequent values overwrite property assignments of previous values.
+     * File type is determined by the extension: json, yml, yaml, hjson.
      *
      * When using YAML files, you can also represent additional JavaScript
      * typtes that are not allowed by JSON and Hjson:
@@ -121,19 +123,11 @@ class SMConfig {
      * 3. The environment that is configured for the hostname
      * 4. Fallback to the `default` environment
      * 
-     * When **`options.flatten`** is true, as per default value, the configuration
-     * data is also "flattened" into a dictionary that uses "dot notation". This
-     * is done with `SMHelper.objectToDotNotation`. By "flattening" the dictionary,
-     * it's possible to use the `get()` method to retrieve nested properties, such
-     * as in `config.get('database.credentials.password')`.
-     * 
-     * @param {Object|string|string[]} config - Configuration params or filename(s) to load
+     * @param {(Array&lt;Object, string, SMConfig>|Object|string|SMConfig)} config - Configuration params or filename(s) to load
      * @param {string} [env=default] - Force a specific environment
-     * @param {object} [options] - Advanced options dictionary
+     * @param {Object} [options] - Advanced options dictionary
      * @param {string} [options.envVarName=SMCONFIG] - Name of the environmental
      *        variable with options passed at runtime.
-     * @param {boolean} [options.flatten=true] - When true, configuration object is
-     * also flatened to "dot notation"
      */
     constructor(config, env, options) {
         // Ensure options is an object
@@ -146,8 +140,7 @@ class SMConfig {
 
         // Defaults for the options parameter
         options = Object.assign({
-            envVarName: 'SMCONFIG',
-            flatten: true
+            envVarName: 'SMCONFIG'
         }, options)
 
         // Ensure the config object is set
@@ -155,28 +148,33 @@ class SMConfig {
             throw Error('Parameter config must be set')
         }
 
-        // If config is a string or array of strings, load the file(s); otherwise,
-        // config is an object that already contains the configuration
-        let configData = {}
-        // Single file to load
-        if (typeof config == 'string') {
-            configData = loadConfigFile(config)
+        // Ensure that the config param is an array
+        if (!Array.isArray(config)) {
+            config = [config]
         }
-        // Array of files
-        else if (Array.isArray(config)) {
-            for (const i in config) {
-                if (typeof config[i] != 'string') {
-                    throw Error('Parameter config must be a string, an array of strings or a plain object')
-                }
-                configData = lodashMerge(configData, loadConfigFile(config[i]))
+
+        // Iterate through the config object and load all data
+        const configData = {}
+        for (const i in config) {
+            // String - represents a file to load
+            if (typeof config[i] == 'string') {
+                lodashMerge(configData, loadConfigFile(config[i]))
             }
-        }
-        // Plain object
-        else if (SMHelper.isPlainObject(config)) {
-            configData = config
-        }
-        else {
-            throw Error('Parameter config must be a string, an array of strings or a plain object')
+            // Another instance of SMConfig
+            else if (config[i] instanceof SMConfig) {
+                // In this case, merge the configuration into the default config object
+                if (!configData.default) {
+                    configData.default = {}
+                }
+                lodashMerge(configData.default, config[i].all)
+            }
+            // Plain object
+            else if (SMHelper.isPlainObject(config[i])) {
+                lodashMerge(configData, config[i])
+            }
+            else {
+                throw Error('Parameter config must be a string, a plain object, or an array of the strings and objects')
+            }    
         }
 
         // Ensure configData contains the default configuration
@@ -202,7 +200,7 @@ class SMConfig {
         let envVars = {}
         const matchExpression = new RegExp('^(' + options.envVarName + '|' + options.envVarName + '_[0-9]+)$')
         /* istanbul ignore else */
-        if (process.env) {
+        if (process &amp;&amp; process.env) {
             for (const key in process.env) {
                 // Check if it's a filename with environments variables as content
                 if (key == options.envVarName + '_FILE') {
@@ -230,13 +228,9 @@ class SMConfig {
         // Store the result in the object
         this._config = lodashMerge({}, configData.default, envConfig, envVars)
 
-        // Flatten all nested objects to dot notation, if necessary
-        if (options.flatten) {
-            const flat = SMHelper.objectToDotNotation(this._config, true)
-
-            // Store in the object a merged dictionary, flattened and unflattened
-            this._config = lodashMerge({}, flat, this._config)
-        }
+        // Store the flattened configuration to "dot notation", 
+        // so we can access nested properties with config.get()
+        this._flatConfig = SMHelper.objectToDotNotation(this._config, true)
     }
 
     /**
@@ -265,8 +259,17 @@ class SMConfig {
         if (!key || typeof key != 'string') {
             throw Error('Parameter key must be a non-empty string')
         }
+
+        // Check if we have it in the flatConfig dictionary first,
+        // to access nested properties
+        let val = this._flatConfig[key]
+        if (val === undefined) {
+            // Check the non-flattened dictionary
+            val = this._config[key]
+        }
+
         // Return a clone of the object so it can't be modified
-        return lodashCloneDeep(this._config[key])
+        return lodashCloneDeep(val)
     }
 }
 
