@@ -120,28 +120,33 @@ class SMConfig {
             throw Error('Parameter config must be set')
         }
 
-        // If config is a string or array of strings, load the file(s); otherwise,
-        // config is an object that already contains the configuration
-        let configData = {}
-        // Single file to load
-        if (typeof config == 'string') {
-            configData = loadConfigFile(config)
+        // Ensure that the config param is an array
+        if (!Array.isArray(config)) {
+            config = [config]
         }
-        // Array of files
-        else if (Array.isArray(config)) {
-            for (const i in config) {
-                if (typeof config[i] != 'string') {
-                    throw Error('Parameter config must be a string, an array of strings or a plain object')
-                }
-                configData = lodashMerge(configData, loadConfigFile(config[i]))
+
+        // Iterate through the config object and load all data
+        const configData = {}
+        for (const i in config) {
+            // String - represents a file to load
+            if (typeof config[i] == 'string') {
+                lodashMerge(configData, loadConfigFile(config[i]))
             }
-        }
-        // Plain object
-        else if (SMHelper.isPlainObject(config)) {
-            configData = config
-        }
-        else {
-            throw Error('Parameter config must be a string, an array of strings or a plain object')
+            // Another instance of SMConfig
+            else if (config[i] instanceof SMConfig) {
+                // In this case, merge the configuration into the default config object
+                if (!configData.default) {
+                    configData.default = {}
+                }
+                lodashMerge(configData.default, config[i].all)
+            }
+            // Plain object
+            else if (SMHelper.isPlainObject(config[i])) {
+                lodashMerge(configData, config[i])
+            }
+            else {
+                throw Error('Parameter config must be a string, a plain object, or an array of the strings and objects')
+            }    
         }
 
         // Ensure configData contains the default configuration
@@ -167,7 +172,7 @@ class SMConfig {
         let envVars = {}
         const matchExpression = new RegExp('^(' + options.envVarName + '|' + options.envVarName + '_[0-9]+)$')
         /* istanbul ignore else */
-        if (process.env) {
+        if (process && process.env) {
             for (const key in process.env) {
                 // Check if it's a filename with environments variables as content
                 if (key == options.envVarName + '_FILE') {

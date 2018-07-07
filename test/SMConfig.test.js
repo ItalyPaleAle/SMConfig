@@ -7,6 +7,7 @@ const assert = require('assert')
 const os = require('os')
 const SMConfig = require('../index')
 const SMHelper = require('smhelper')
+const lodashCloneDeep = require('lodash.clonedeep')
 
 const expected = require('./resources/expected')
 
@@ -55,7 +56,7 @@ describe('SMConfig.js', function() {
             // Parameter config not a string neither an object
             assert.throws(() => {
                 new SMConfig(12)
-            }, /parameter config must be a string, an array of strings or a plain object/i)
+            }, /parameter config must be/i)
 
             // Missing config.default
             assert.throws(() => {
@@ -135,6 +136,19 @@ describe('SMConfig.js', function() {
             assert.equal(config.environment, 'hostenv')
         })
 
+        it('Environment: invalid hostname definition', function() {
+            // Should always fallback to default
+            const testParams1 = lodashCloneDeep(params)
+            testParams1.hostnames = {invalid: 'not an array'}
+            let config = new SMConfig(testParams1)
+            assert.deepStrictEqual(config.all, defaultExpect)
+
+            const testParams2 = lodashCloneDeep(params)
+            testParams2.hostnames = {invalid: [42]}
+            config = new SMConfig(testParams2)
+            assert.deepStrictEqual(config.all, defaultExpect)
+        })
+
         it('Environment: use NODE_ENV environmental variable', function() {
             // Note: in this test, process.hostname.hostenv should still be set
             // and it should be overridden
@@ -150,21 +164,23 @@ describe('SMConfig.js', function() {
         })
 
         it('Environment: passing environment to constructor', function() {
-            // Note: in this test, process.hostname.hostenv and NODE_ENV are still set,
-            // but should both be overridden
+            process.env.NODE_ENV = 'envvar'
 
             const config = new SMConfig(params, 'passedenv')
             assert.equal(config.environment, 'passedenv')
+
+            // Cleanup
+            delete process.env.NODE_ENV
         })
 
         it('Configuration: load default configuration', function() {
+            process.env.NODE_ENV = 'envvar'
+
             const config = new SMConfig(params, 'nonexisting')
             assert.deepStrictEqual(config.all, defaultExpect)
-        })
 
-        it('Configuration: do not flatten configuration', function() {
-            const config = new SMConfig(params, 'nonexisting', {flatten: false})
-            assert.deepStrictEqual(config.all, params.default)
+            // Cleanup
+            delete process.env.NODE_ENV
         })
 
         it('Configuration: load configuration for specific environment', function() {
@@ -212,12 +228,14 @@ describe('SMConfig.js', function() {
             expect.obj.z = 'New'
             expect.obj.x = 'overwrite'
             expect.obj.intNum = -8
-            expect['obj.z'] = 'New'
-            expect['obj.x'] = 'overwrite'
-            expect['obj.intNum'] = -8
 
             const config = new SMConfig(params, 'testenv2')
             assert.deepStrictEqual(config.all, expect)
+
+            // Check nested values
+            assert.strictEqual(config.get('obj.z'), 'New')
+            assert.strictEqual(config.get('obj.x'), 'overwrite')
+            assert.strictEqual(config.get('obj.intNum'), -8)
 
             // Cleanup
             delete process.env.SMCONFIG
@@ -240,12 +258,14 @@ describe('SMConfig.js', function() {
             expect.obj.x = 'overwrite'
             expect.obj.intNum = -8
             expect.fruit = 'pear'
-            expect['obj.z'] = 'New'
-            expect['obj.x'] = 'overwrite'
-            expect['obj.intNum'] = -8
 
             const config = new SMConfig(params, 'testenv2')
             assert.deepStrictEqual(config.all, expect)
+
+            // Check nested values
+            assert.strictEqual(config.get('obj.z'), 'New')
+            assert.strictEqual(config.get('obj.x'), 'overwrite')
+            assert.strictEqual(config.get('obj.intNum'), -8)
 
             // Cleanup
             delete process.env.SMCONFIG
@@ -280,10 +300,12 @@ describe('SMConfig.js', function() {
             expect.cake = 0.33
             expect.quote = 'la nebbia agl\'irti colli piovigginando sale'
             expect.obj.z = 'foo'
-            expect['obj.z'] = 'foo'
 
             const config = new SMConfig(params, 'default')
             assert.deepStrictEqual(config.all, expect)
+
+            // Check nested values
+            assert.strictEqual(config.get('obj.z'), 'foo')
 
             // Cleanup
             delete process.env.SMCONFIG_FILE
@@ -376,7 +398,41 @@ describe('SMConfig.js', function() {
         it('Configuration: load multiple files, with an invalid filename', function() {
             assert.throws(() => {
                 new SMConfig(['test/resources/testconfig.json', 42])
-            }, /parameter config must be a string, an array of strings or a plain object/i)
+            }, /parameter config must be/i)
+        })
+
+        it('Configuration: load from a file and an object', function() {
+            const obj = {default: {fruit: 'apple', obj: {y: -1, z: 42}}}
+
+            const expect = SMHelper.cloneObject(testenv2Expect)
+            expect.fruit = 'apple'
+            expect.obj.y = -1
+            expect.obj.z = 42
+
+            // Use another env var name so the env vars set before are ignored
+            const config = new SMConfig(['test/resources/testconfig.json', obj], 'testenv2', {envVarName: 'NOTHINGHERE'})
+            assert.deepStrictEqual(config.all, expect)
+        })
+
+        it('Configuration: load from another instance of SMConfig', function() {
+            // Use another env var name so the env vars set before are ignored
+            const config1 = new SMConfig('test/resources/testconfig.json', 'testenv2', {envVarName: 'NOTHINGHERE'})
+            assert.deepStrictEqual(config1.all, testenv2Expect)
+
+            // The data from config1 is added in the "default" environment, so no need to specify another env
+            const config2 = new SMConfig(config1, null, {envVarName: 'NOTHINGHERE'})
+            assert.deepStrictEqual(config2.all, testenv2Expect)
+
+            // Add another file
+            const config3 = new SMConfig(['test/resources/addendum.json', config2], null, {envVarName: 'NOTHINGHERE'})
+            const expect = SMHelper.cloneObject(testenv2Expect)
+            expect.fruit = 'pear'
+            assert.deepStrictEqual(config3.all, expect)
+
+            // Same as above, but with environment
+            const config4 = new SMConfig(['test/resources/addendum.json', config2], 'addendum', {envVarName: 'NOTHINGHERE'})
+            expect.fruit = 'apricot'
+            assert.deepStrictEqual(config4.all, expect)
         })
     })
 
@@ -408,7 +464,7 @@ describe('SMConfig.js', function() {
         })
 
         it('SMConfig.all should return a cloned object', function() {
-            const config = new SMConfig({default: {a: 1, obj: {x: 1, y: 2}}, myenv: {b: 2}}, 'myenv', {envVarName: 'NOTHINGHERE', flatten: false})
+            const config = new SMConfig({default: {a: 1, obj: {x: 1, y: 2}}, myenv: {b: 2}}, 'myenv', {envVarName: 'NOTHINGHERE'})
 
             // The returned object should be a clone, so editing a value in it shouldn't change the value in the SMConfig instance
             const all = config.all
@@ -434,7 +490,7 @@ describe('SMConfig.js', function() {
 
         it('SMConfig.get should return a cloned object', function() {
             // Use another prefix for env vars so the ones set before are ignored
-            const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar'],  obj: {x: 1, y: 2}}}, 'myenv', {envVarPrefix: 'NOTHING_', flatten: false})
+            const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar'],  obj: {x: 1, y: 2}}}, 'myenv', {envVarPrefix: 'NOTHING_'})
             const obj = config.get('obj')
             assert.deepStrictEqual(obj,  {x: 1, y: 2})
             obj.x = -10
