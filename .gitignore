@@ -1,3 +1,6 @@
+# Output of npm pack
+smconfig*.tgz
+
 # Created by https://www.gitignore.io/api/node,linux,macos,windows
 
 ### Node ###
