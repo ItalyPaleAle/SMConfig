@@ -1,6 +1,6 @@
 {
   "name": "smconfig",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Application configuration module for Node.js",
   "main": "index.js",
   "directories": {
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EgoAleSum/SMConfig.git"
+    "url": "git+https://github.com/ItalyPaleAle/SMConfig.git"
   },
   "keywords": [
     "configuration",
@@ -25,23 +25,23 @@
   "author": "Alessandro Segala, SixthMonkey",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/EgoAleSum/SMConfig/issues"
+    "url": "https://github.com/ItalyPaleAle/SMConfig/issues"
   },
-  "homepage": "https://github.com/EgoAleSum/SMConfig",
+  "homepage": "https://github.com/ItalyPaleAle/SMConfig",
   "dependencies": {
     "hjson": "^3.1.1",
     "js-yaml": "^3.12.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.1",
-    "smhelper": "^1.1.3"
+    "smhelper": "^1.1.4"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
-    "eslint": "^5.0.1",
+    "eslint": "^5.2.0",
     "istanbul": "^0.4.5",
     "jsdoc": "^3.5.5",
     "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
-    "should": "^13.2.1"
+    "should": "^13.2.2"
   }
 }
