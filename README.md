@@ -13,7 +13,7 @@ Features:
 - Automatic environment detection based on hostname
 - Override configuration at runtime with environmental variables or ".env" files
 - Load configuration from JSON, YAML and [Hjson](http://hjson.org) documents
-- Plugin for Hapi 17+
+- Optional plugin for Hapi 17+
 
 This code is licensed under the terms of the MIT license (see LICENSE.md).
 
