@@ -1,223 +1,345 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html class="default no-js">
 <head>
-    <meta charset="utf-8">
-    <title>JSDoc: Home</title>
-
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>SMClean</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
 </head>
-
 <body>
-
-<div id="main">
-
-    <h1 class="page-title">Home</h1>
-
-    
-
-
-
-    
-
-
-    <h3> </h3>
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-    <section>
-        <article><h1>SMConfig v2.0</h1><p><a href="https://travis-ci.org/ItalyPaleAle/SMConfig"><img src="https://travis-ci.org/ItalyPaleAle/SMConfig.svg?branch=master" alt="Build Status"></a>
-<a href="https://coveralls.io/github/ItalyPaleAle/SMConfig?branch=master"><img src="https://coveralls.io/repos/github/ItalyPaleAle/SMConfig/badge.svg?branch=master" alt="Coverage Status"></a>
-<a href="https://david-dm.org/ItalyPaleAle/SMConfig"><img src="https://david-dm.org/ItalyPaleAle/SMConfig.svg?style=flat" alt="Dependency Status"></a>
-<a href="https://david-dm.org/ItalyPaleAle/SMConfig#info=devDependencies"><img src="https://david-dm.org/ItalyPaleAle/SMConfig/dev-status.svg?style=flat" alt="devDependency Status"></a></p>
-<p>Application configuration module for Node.js.</p>
-<p>Features:</p>
-<ul>
-<li>Simple, yet flexible APIs</li>
-<li>Automatic environment detection based on hostname</li>
-<li>Override configuration at runtime with environmental variables or &quot;.env&quot; files</li>
-<li>Load configuration from JSON, YAML and <a href="http://hjson.org">Hjson</a> documents</li>
-<li>Plugin for Hapi 17+</li>
-</ul>
-<p>This code is licensed under the terms of the MIT license (see LICENSE.md).</p>
-<h2>Add to your project</h2><p>Install from NPM:</p>
-<pre class="prettyprint source lang-sh"><code>npm install --save smconfig</code></pre><h2>API Guide</h2><p>Include the module with:</p>
-<pre class="prettyprint source lang-js"><code>const SMConfig = require('smconfig')</code></pre><p>The module exports a class named <code>SMConfig</code>.</p>
-<h3>Constructor: SMConfig(config, env, options)</h3><pre class="prettyprint source lang-js"><code>const conf = new SMConfig(config, env, options)</code></pre><h4>Parameters</h4><ul>
-<li><code>config</code>: configuration object (read below for description)</li>
-<li><code>env</code>: when set, forces a specific environment</li>
-<li><code>options</code>: dictionary with options:<ul>
-<li><code>options.envVarName</code>: name of the environmental variable where options are passed (default: <code>SMCONFIG</code>)</li>
-</ul>
-</li>
-</ul>
-<p>The constructor determines the environment, then loads the configuration for the environment and stores it in the object.</p>
-<h4>Config data</h4><p>The <strong><code>config</code></strong> paramter can be:</p>
-<ul>
-<li>A plain JavaScript object, respecting the structure in the example below.</li>
-<li>The filename (as string) of a JSON, YAML or Hjson file. File type is determined by the extension, and supported ones are: <code>*.json</code>, <code>*.yaml</code>, <code>*.yml</code> and <code>*.hjson</code>. The content of the file must represent a structure like the one below.</li>
-<li>Another instance of SMConfig. In this case, the constructor will merge the content of <code>config.all</code> from the other object into the &quot;default&quot; section.</li>
-<li>An array mixing any of the above. In this case, data will be merged from left to right: subsequent values overwrite property assignments of previous values.</li>
-</ul>
-<h4>Config object structure</h4><p>The config object must have the following basic structure:</p>
-<ul>
-<li>The <code>default</code> key is always required, containing the default config values for all the environments.</li>
-<li>The <code>hostnames</code> key can be defined. This is a dictionary in which the key is the environment name, and the value is an array of possible hostnames to match (exact string matches, strings with wildcard matching using <code>*</code>, or regular expressions).</li>
-<li>Any other key represents the configuration for the environment named like the key. For example, you can define the configuration for the &quot;production&quot; environment in the <code>production</code> key, and that will inherit from the <code>default</code> configuration all values not specified.</li>
-</ul>
-<p>For example:</p>
-<pre class="prettyprint source lang-js"><code>const configData = {
-    // Default configuration, for all environments
-    default: {
-        key1: 'value1',
-        key2: 'value2'
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">SMClean</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> SMClean</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="smconfig-v2-0">SMConfig v2.0</h1>
+				<p><a href="https://travis-ci.org/ItalyPaleAle/SMConfig"><img src="https://travis-ci.org/ItalyPaleAle/SMConfig.svg?branch=master" alt="Build Status"></a>
+					<a href="https://coveralls.io/github/ItalyPaleAle/SMConfig?branch=master"><img src="https://coveralls.io/repos/github/ItalyPaleAle/SMConfig/badge.svg?branch=master" alt="Coverage Status"></a>
+					<a href="https://david-dm.org/ItalyPaleAle/SMConfig"><img src="https://david-dm.org/ItalyPaleAle/SMConfig.svg?style=flat" alt="Dependency Status"></a>
+				<a href="https://david-dm.org/ItalyPaleAle/SMConfig#info=devDependencies"><img src="https://david-dm.org/ItalyPaleAle/SMConfig/dev-status.svg?style=flat" alt="devDependency Status"></a></p>
+				<p>Application configuration module for Node.js.</p>
+				<p>Features:</p>
+				<ul>
+					<li>Simple, yet flexible APIs</li>
+					<li>Automatic environment detection based on hostname</li>
+					<li>Override configuration at runtime with environmental variables or &quot;.env&quot; files</li>
+					<li>Load configuration from JSON, YAML and <a href="http://hjson.org">Hjson</a> documents</li>
+					<li>Optional plugin for Hapi 17+</li>
+				</ul>
+				<p>This module is written in TypeScript and transpiled to JavaScript. All typings are available alongside the code.</p>
+				<p>This code is licensed under the terms of the MIT license (see LICENSE.md).</p>
+				<h2 id="full-documentation">Full documentation</h2>
+				<p>Full documentation is available on <a href="https://italypaleale.github.io/SMConfig/">GitHub pages</a>.</p>
+				<h2 id="add-to-your-project">Add to your project</h2>
+				<p>Install from NPM:</p>
+				<pre><code class="language-sh">npm install --save smconfig</code></pre>
+				<h2 id="api-guide">API Guide</h2>
+				<p>Include the module with:</p>
+				<pre><code class="language-js"><span class="hljs-keyword">const</span> SMConfig = <span class="hljs-built_in">require</span>(<span class="hljs-string">'smconfig'</span>)</code></pre>
+				<p>The module exports a class named <code>SMConfig</code>.</p>
+				<h3 id="constructor-smconfig-config-env-options-">Constructor: SMConfig(config, env, options)</h3>
+				<pre><code class="language-js"><span class="hljs-keyword">const</span> conf = <span class="hljs-keyword">new</span> SMConfig(config, env, options)</code></pre>
+				<h4 id="parameters">Parameters</h4>
+				<ul>
+					<li><code>config</code>: configuration object (read below for description)</li>
+					<li><code>env</code>: when set, forces a specific environment</li>
+					<li><code>options</code>: dictionary with options:<ul>
+							<li><code>options.envVarName</code>: name of the environmental variable where options are passed (default: <code>SMCONFIG</code>)</li>
+						</ul>
+					</li>
+				</ul>
+				<p>The constructor determines the environment, then loads the configuration for the environment and stores it in the object.</p>
+				<h4 id="config-data">Config data</h4>
+				<p>The <strong><code>config</code></strong> paramter can be:</p>
+				<ul>
+					<li>A plain JavaScript object, respecting the structure in the example below.</li>
+					<li>The filename (as string) of a JSON, YAML or Hjson file. File type is determined by the extension, and supported ones are: <code>*.json</code>, <code>*.yaml</code>, <code>*.yml</code> and <code>*.hjson</code>. The content of the file must represent a structure like the one below.</li>
+					<li>Another instance of SMConfig. In this case, the constructor will merge the content of <code>config.all</code> from the other object into the &quot;default&quot; section.</li>
+					<li>An array mixing any of the above. In this case, data will be merged from left to right: subsequent values overwrite property assignments of previous values.</li>
+				</ul>
+				<h4 id="config-object-structure">Config object structure</h4>
+				<p>The config object must have the following basic structure:</p>
+				<ul>
+					<li>The <code>default</code> key is always required, containing the default config values for all the environments.</li>
+					<li>The <code>hostnames</code> key can be defined. This is a dictionary in which the key is the environment name, and the value is an array of possible hostnames to match (exact string matches, strings with wildcard matching using <code>*</code>, or regular expressions).</li>
+					<li>Any other key represents the configuration for the environment named like the key. For example, you can define the configuration for the &quot;production&quot; environment in the <code>production</code> key, and that will inherit from the <code>default</code> configuration all values not specified.</li>
+				</ul>
+				<p>For example:</p>
+				<pre><code class="language-js"><span class="hljs-keyword">const</span> configData = {
+    <span class="hljs-comment">// Default configuration, for all environments</span>
+    <span class="hljs-keyword">default</span>: {
+        <span class="hljs-attr">key1</span>: <span class="hljs-string">'value1'</span>,
+        <span class="hljs-attr">key2</span>: <span class="hljs-string">'value2'</span>
     },
 
-    // Each subsequent key is the name of the environment;
-    // this can be anything you want
+    <span class="hljs-comment">// Each subsequent key is the name of the environment;</span>
+    <span class="hljs-comment">// this can be anything you want</span>
     dev: {
-        // Custom environments inherit all keys from the default
-        // environment, but can be overwritten here
-        key1: 'override',
-        newkey: 'helloworld'
+        <span class="hljs-comment">// Custom environments inherit all keys from the default</span>
+        <span class="hljs-comment">// environment, but can be overwritten here</span>
+        key1: <span class="hljs-string">'override'</span>,
+        <span class="hljs-attr">newkey</span>: <span class="hljs-string">'helloworld'</span>
     },
-    production: {
-        key1: 'override'
+    <span class="hljs-attr">production</span>: {
+        <span class="hljs-attr">key1</span>: <span class="hljs-string">'override'</span>
     },
-    otherenvironment: {},
+    <span class="hljs-attr">otherenvironment</span>: {},
 
-    // The hostnames object contains a dictionary of hostnames that are
-    // mapped to a specific environment.
+    <span class="hljs-comment">// The hostnames object contains a dictionary of hostnames that are</span>
+    <span class="hljs-comment">// mapped to a specific environment.</span>
     hostnames: {
-        // Name of the environment, then list of hostnames
+        <span class="hljs-comment">// Name of the environment, then list of hostnames</span>
         dev: [
-            'alessandro.localdomain'
+            <span class="hljs-string">'alessandro.localdomain'</span>
         ],
-        production: [
-            // Can use * as wildcard
-            '*.example.com',
-            // Can also use RegExp objects
+        <span class="hljs-attr">production</span>: [
+            <span class="hljs-comment">// Can use * as wildcard</span>
+            <span class="hljs-string">'*.example.com'</span>,
+            <span class="hljs-comment">// Can also use RegExp objects</span>
             /(.*?)\.example\.com$/i
         ]
     }
 }
 
-// Example:
-const conf = new SMConfig(configData)</code></pre><h4>Load config data from files</h4><p>In place of a config object, you can pass a string with the path of a file to load with the config object.</p>
-<pre class="prettyprint source lang-js"><code>// Load a file
-const obj = new SMConfig('config.json')
+<span class="hljs-comment">// Example:</span>
+<span class="hljs-keyword">const</span> conf = <span class="hljs-keyword">new</span> SMConfig(configData)</code></pre>
+				<h4 id="load-config-data-from-files">Load config data from files</h4>
+				<p>In place of a config object, you can pass a string with the path of a file to load with the config object.</p>
+				<pre><code class="language-js"><span class="hljs-comment">// Load a file</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">new</span> SMConfig(<span class="hljs-string">'config.json'</span>)
 
-// Load multiple files
-const obj = new SMConfig(['config.json', 'config2.yaml'])</code></pre><p>For sample configuration files in JSON, YAML and Hjson, check the documents in the test folder:</p>
-<ul>
-<li><a href="test/resources/testconfig.json">Sample JSON configuration</a></li>
-<li><a href="test/resources/testconfig.yaml">Sample YAML configuration</a></li>
-<li><a href="test/resources/testconfig.hjson">Sample Hjson configuration</a></li>
-</ul>
-<p>When using YAML, you can also use the following types that are not supported by JSON and Hjson: (see documentation for <a href="https://github.com/nodeca/js-yaml">js-yaml</a> for more information)</p>
-<ul>
-<li>RegExp: <code>!!js/regexp /pattern/gim</code></li>
-<li>Functions: <code>!!js/function 'function () {...}'</code></li>
-<li>Undefined: <code>!!js/undefined ''</code></li>
-</ul>
-<h4>Using environmental variables</h4><p>Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with an environmental variable. The variable <code>SMCONFIG</code> (name can be changed with <strong><code>options.envVarName</code></strong>) can contain a set of key-values. You can also append <code>_1</code>, <code>_2</code>, etc, to pass multiple environmental variables. For example:</p>
-<pre class="prettyprint source lang-sh"><code># SMConfig will store 'Passw0rd' for the 'databasePassword' key
-SMCONFIG=&quot;databasePassword=Passw0rd&quot; \
+<span class="hljs-comment">// Load multiple files</span>
+<span class="hljs-keyword">const</span> obj = <span class="hljs-keyword">new</span> SMConfig([<span class="hljs-string">'config.json'</span>, <span class="hljs-string">'config2.yaml'</span>])</code></pre>
+				<p>For sample configuration files in JSON, YAML and Hjson, check the documents in the test folder:</p>
+				<ul>
+					<li><a href="test/resources/testconfig.json">Sample JSON configuration</a></li>
+					<li><a href="test/resources/testconfig.yaml">Sample YAML configuration</a></li>
+					<li><a href="test/resources/testconfig.hjson">Sample Hjson configuration</a></li>
+				</ul>
+				<p>When using YAML, you can also use the following types that are not supported by JSON and Hjson: (see documentation for <a href="https://github.com/nodeca/js-yaml">js-yaml</a> for more information)</p>
+				<ul>
+					<li>RegExp: <code>!!js/regexp /pattern/gim</code></li>
+					<li>Functions: <code>!!js/function &#39;function () {...}&#39;</code></li>
+					<li>Undefined: <code>!!js/undefined &#39;&#39;</code></li>
+				</ul>
+				<h4 id="using-environmental-variables">Using environmental variables</h4>
+				<p>Configuration can also be passed at runtime (and it can override what is defined in the application or in the config files) with an environmental variable. The variable <code>SMCONFIG</code> (name can be changed with <strong><code>options.envVarName</code></strong>) can contain a set of key-values. You can also append <code>_1</code>, <code>_2</code>, etc, to pass multiple environmental variables. For example:</p>
+				<pre><code class="language-sh"><span class="hljs-comment"># SMConfig will store 'Passw0rd' for the 'databasePassword' key</span>
+SMCONFIG=<span class="hljs-string">"databasePassword=Passw0rd"</span> \
   node myapp.js
 
-# Nested properties can be passed too, for example `database.password`
-SMCONFIG=&quot;database.password=Passw0rd&quot; \
+<span class="hljs-comment"># Nested properties can be passed too, for example `database.password`</span>
+SMCONFIG=<span class="hljs-string">"database.password=Passw0rd"</span> \
   node myapp.js
 
-# Multiple values can be passed
-SMCONFIG=&quot;database.password=Passw0rd database.username=admin&quot; \
+<span class="hljs-comment"># Multiple values can be passed</span>
+SMCONFIG=<span class="hljs-string">"database.password=Passw0rd database.username=admin"</span> \
   node myapp.js
 
-# You can add multiple environmental variable by appending `_#`
-SMCONFIG=&quot;passphrase='hello world'&quot; \
-  SMCONFIG_1=&quot;hello=world&quot; \
-  SMCONFIG_2=&quot;a=b&quot; \
+<span class="hljs-comment"># You can add multiple environmental variable by appending `_#`</span>
+SMCONFIG=<span class="hljs-string">"passphrase='hello world'"</span> \
+  SMCONFIG_1=<span class="hljs-string">"hello=world"</span> \
+  SMCONFIG_2=<span class="hljs-string">"a=b"</span> \
   node myapp.js
 
-# If the value contains a space, quote it
-SMCONFIG_1=&quot;passphrase='hello world'&quot; \
-  SMCONFIG_2=&quot;secret=\&quot;psshhh\&quot;&quot; \
-  node myapp.js</code></pre><p>You can also use the <code>SMCONFIG_FILE</code> (or <code>options.envVarName + '_FILE'</code>) to load a file with a list of values expressed as environmental variables. This is the same format of &quot;.env&quot; files, and can be used with <strong>Docker secrets</strong> as well.</p>
-<p>A &quot;.env&quot; file has a list of config values expressed as <code>key=value</code>, separated by spacing characters (e.g. spaces or newlines). You can use single or double quotes to escape characters. Comments are not supported</p>
-<p>Example of a &quot;.env&quot; file:</p>
-<pre class="prettyprint source lang-text"><code>hello=world
+<span class="hljs-comment"># If the value contains a space, quote it</span>
+SMCONFIG_1=<span class="hljs-string">"passphrase='hello world'"</span> \
+  SMCONFIG_2=<span class="hljs-string">"secret=\"psshhh\""</span> \
+  node myapp.js</code></pre>
+				<p>You can also use the <code>SMCONFIG_FILE</code> (or <code>options.envVarName + &#39;_FILE&#39;</code>) to load a file with a list of values expressed as environmental variables. This is the same format of &quot;.env&quot; files, and can be used with <strong>Docker secrets</strong> as well.</p>
+				<p>A &quot;.env&quot; file has a list of config values expressed as <code>key=value</code>, separated by spacing characters (e.g. spaces or newlines). You can use single or double quotes to escape characters. Comments are not supported</p>
+				<p>Example of a &quot;.env&quot; file:</p>
+				<pre><code class="language-text">hello=world
 quotes=&quot;required when using spaces&quot;
-escape='it\'s my life'
-nested.value=&quot;updated value in a nested object&quot;</code></pre><p>Example of loading the file:</p>
-<pre class="prettyprint source lang-sh"><code># Loading the .env file
-SMCONFIG_FILE=&quot;path/to/.env&quot; \
+escape=&#39;it\&#39;s my life&#39;
+nested.value=&quot;updated value in a nested object&quot;</code></pre>
+				<p>Example of loading the file:</p>
+				<pre><code class="language-sh"><span class="hljs-comment"># Loading the .env file</span>
+SMCONFIG_FILE=<span class="hljs-string">"path/to/.env"</span> \
   node myapp.js
 
-# This can be used with Docker secrets too
-SMCONFIG_FILE=&quot;/run/secrets/env&quot; \
-  node myapp.js</code></pre><h4>Environment</h4><p>The environment is determined by, in order:</p>
-<ol>
-<li>The value passed to the <strong><code>env</code></strong> parameter</li>
-<li>The <code>process.env.NODE_ENV</code> environmental variable (when launching the application; for example: <code>$ NODE_ENV=production node myapp.js</code>)</li>
-<li>The environment that is configured for the hostname (see below)</li>
-<li>Fallback to the <code>default</code> environment</li>
-</ol>
-<h3>SMConfig.get(key)</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
-const databasePassword = config.get('databasePassword')
+<span class="hljs-comment"># This can be used with Docker secrets too</span>
+SMCONFIG_FILE=<span class="hljs-string">"/run/secrets/env"</span> \
+  node myapp.js</code></pre>
+				<h4 id="environment">Environment</h4>
+				<p>The environment is determined by, in order:</p>
+				<ol>
+					<li>The value passed to the <strong><code>env</code></strong> parameter</li>
+					<li>The <code>process.env.NODE_ENV</code> environmental variable (when launching the application; for example: <code>$ NODE_ENV=production node myapp.js</code>)</li>
+					<li>The environment that is configured for the hostname (see below)</li>
+					<li>Fallback to the <code>default</code> environment</li>
+				</ol>
+				<h3 id="smconfig-get-key-">SMConfig.get(key)</h3>
+				<pre><code class="language-js"><span class="hljs-comment">// config is an instance of SMConfig</span>
+<span class="hljs-keyword">const</span> databasePassword = config.get(<span class="hljs-string">'databasePassword'</span>)
 
-// You can access nested properties using the &quot;dot notation&quot;
-const nested = config.get('database.credentials.password')</code></pre><p>Returns the value for the key passed as argument, reading from the configuration for the environment.</p>
-<h3>SMConfig.environment</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
-const env = config.environment</code></pre><p>The <strong><code>environment</code></strong> property, which is read-only, contains the name of the environment being used by the application.</p>
-<h3>SMConfig.all</h3><pre class="prettyprint source lang-js"><code>// config is an instance of SMConfig
-const allConfiguration = config.all</code></pre><p>The <strong><code>all</code></strong> property, which is read-only, contains all the configuration variables for the current environment.</p>
-<h2>Hapi plugin</h2><p>This module offers an optional plugin for <a href="https://hapijs.com/">Hapi</a> (version 17 or higher required).</p>
-<p>To use it, initialize the SMConfig object as normal, then register the plugin with Hapi passing the instance of SMConfig.</p>
-<p>Example:</p>
-<pre class="prettyprint source lang-js"><code>const SMConfig = require('smconfig')
-const conf = new SMConfig(config, env, options)
+<span class="hljs-comment">// You can access nested properties using the "dot notation"</span>
+<span class="hljs-keyword">const</span> nested = config.get(<span class="hljs-string">'database.credentials.password'</span>)</code></pre>
+				<p>Returns the value for the key passed as argument, reading from the configuration for the environment.</p>
+				<h3 id="smconfig-environment">SMConfig.environment</h3>
+				<pre><code class="language-js"><span class="hljs-comment">// config is an instance of SMConfig</span>
+<span class="hljs-keyword">const</span> env = config.environment</code></pre>
+				<p>The <strong><code>environment</code></strong> property, which is read-only, contains the name of the environment being used by the application.</p>
+				<h3 id="smconfig-all">SMConfig.all</h3>
+				<pre><code class="language-js"><span class="hljs-comment">// config is an instance of SMConfig</span>
+<span class="hljs-keyword">const</span> allConfiguration = config.all</code></pre>
+				<p>The <strong><code>all</code></strong> property, which is read-only, contains all the configuration variables for the current environment.</p>
+				<h2 id="hapi-plugin">Hapi plugin</h2>
+				<p>This module offers an optional plugin for <a href="https://hapijs.com/">Hapi</a> (version 17 or higher required).</p>
+				<p>To use it, initialize the SMConfig object as normal, then register the plugin with Hapi passing the instance of SMConfig.</p>
+				<p>Example:</p>
+				<pre><code class="language-js"><span class="hljs-keyword">const</span> SMConfig = <span class="hljs-built_in">require</span>(<span class="hljs-string">'smconfig'</span>)
+<span class="hljs-keyword">const</span> conf = <span class="hljs-keyword">new</span> SMConfig(config, env, options)
 
-await server.register({
-    plugin: require('smconfig/plugins/hapi'),
-    options: {config: conf}
-})</code></pre></article>
-    </section>
-
-
-
-
-
-
+<span class="hljs-keyword">await</span> server.register({
+    <span class="hljs-attr">plugin</span>: <span class="hljs-built_in">require</span>(<span class="hljs-string">'smconfig/plugins/hapi'</span>),
+    <span class="hljs-attr">options</span>: {<span class="hljs-attr">config</span>: conf}
+})</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_getenvironment_.html">"<wbr>Get<wbr>Environment"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_loadconfigfile_.html">"<wbr>Load<wbr>Config<wbr>File"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_parseenvvar_.html">"<wbr>Parse<wbr>Env<wbr>Var"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_smconfig_.html">"SMConfig"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
 </div>
-
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-getEnvironment.html">getEnvironment</a></li><li><a href="module-loadConfigFile.html">loadConfigFile</a></li><li><a href="module-parseEnvVar.html">parseEnvVar</a></li></ul><h3>Classes</h3><ul><li><a href="SMConfig.html">SMConfig</a></li></ul>
-</nav>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
 </footer>
-
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>

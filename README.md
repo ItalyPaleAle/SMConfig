@@ -15,7 +15,13 @@ Features:
 - Load configuration from JSON, YAML and [Hjson](http://hjson.org) documents
 - Optional plugin for Hapi 17+
 
+This module is written in TypeScript and transpiled to JavaScript. All typings are available alongside the code.
+
 This code is licensed under the terms of the MIT license (see LICENSE.md).
+
+## Full documentation
+
+Full documentation is available on [GitHub pages](https://italypaleale.github.io/SMConfig/).
 
 ## Add to your project
 
