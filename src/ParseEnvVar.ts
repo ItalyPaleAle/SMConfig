@@ -13,6 +13,14 @@ function parseToken(token) {
     return token
 }
 
+// Returns true if the character is a spacing one
+// Grabbed from \s from regular expressions
+// Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+const spacingChars = [' ', '\f', '\n', '\r', '\t', '\v', '\u00a0', '\u1680', '\u2000-', '\u200a', '\u2028', '\u2029', '\u202f', '\u205f', '\u3000', '\ufeff']
+function isSpacing(char: string): boolean {
+    return (spacingChars.indexOf(char) >= 0)
+}
+
 /**
  * Load additional configuration from environmental variables.
  * Pass the content of an environmental variable to the function, and it will
@@ -25,14 +33,6 @@ function parseToken(token) {
  * @return Dictionary with the configuration parsed.
  */
 export function ParseEnvVar(str: string): Dictionary {
-    // Returns true if the character is a spacing one
-    // Grabbed from \s from regular expressions
-    // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-    const spacingChars = [' ', '\f', '\n', '\r', '\t', '\v', '\u00a0', '\u1680', '\u2000-', '\u200a', '\u2028', '\u2029', '\u202f', '\u205f', '\u3000', '\ufeff']
-    const isSpacing = (char) => {
-        return spacingChars.includes(char)
-    }
-
     // Parse the string passed as environmental variable
     const result = {} as Dictionary
     let mode = 0 // 0 = key, 1 = value, &2 = single quote, &4 = double quote
@@ -50,7 +50,7 @@ export function ParseEnvVar(str: string): Dictionary {
                 escapeable.push('"')
             }
 
-            if (escapeable.includes(str[i + 1])) {
+            if (escapeable.indexOf(str[i + 1]) >= 0) {
                 // Add the following character and advance i automatically
                 token += str[i + 1]
                 i++
