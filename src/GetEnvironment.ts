@@ -1,31 +1,24 @@
-'use strict'
-
-/**
- * @module getEnvironment
- */
-
-const os = require('os')
-const SMHelper = require('smhelper')
+import os from 'os'
+import SMHelper from 'smhelper'
+import {HostnamesMap} from './SharedTypes'
 
 /**
  * Determines the environment to use.
- * 
+ *
  * 1. The value of the `env` parameter
  * 2. The value of `process.env.NODE_ENV`
  * 3. Determine the environment by looking up the machine's hostname.
- * 
+ *
  * The `hostnames` dictionary is a set of key-value pairs in which the key is the name
  * of the environment, and the value is an array of hostnames that are used for that
  * environment. Values can be strings (in which the * is used as glob for matching)
  * or regular expressions objects.
- * 
- * @param {string} [env] - If passed, this is the environment that will be used
- * @param {Object.<string, Array.<string|RegExp>>} [hostnames] - Dictionary in which 
- *        each key is the environment name, and the value is an array of hostnames
- *        to match.
- * @return {string} The environment to use
+ *
+ * @param env - If passed, this is the environment that will be used
+ * @param hostnames - Dictionary in which each key is the environment name, and the value is an array of hostnames to match.
+ * @return The environment to use
  */
-function getEnvironment(env, hostnames) {
+export function GetEnvironment(env?: string, hostnames?: HostnamesMap): string {
     // 1. The value passed in the `env` parameter
     env = env ? SMHelper.toStringSafe(env) : null
     if (env) {
@@ -54,8 +47,7 @@ function getEnvironment(env, hostnames) {
             }
 
             // Iterate through the list of hostnames
-            for (const i in hostnames[e]) {
-                const v = hostnames[e][i]
+            for (const v of hostnames[e]) {
                 if (!v) {
                     continue
                 }
@@ -85,5 +77,3 @@ function getEnvironment(env, hostnames) {
     // 4. Fallback to the default environment
     return 'default'
 }
-
-module.exports = getEnvironment

@@ -1,16 +1,12 @@
-/*eslint-env mocha */
-
-'use strict'
-
-require('should')
-const assert = require('assert')
-const SMHelper = require('smhelper')
-const childProcess = require('child_process')
-const expected = require('./resources/expected')
+import 'mocha'
+import assert from 'assert'
+import {exec} from 'child_process'
+import expected = require('./resources/expected')
+import SMHelper from 'smhelper'
 
 const execPromise = (command) => {
     return new Promise((resolve, reject) => {
-        childProcess.exec(command, (err, stdout, stderr) => {
+        exec(command, (err, stdout, stderr) => {
             if (err) {
                 return reject(err)
             }
@@ -22,8 +18,8 @@ const execPromise = (command) => {
 
 describe('SMConfig test via shell', function() {
 
-    const defaultExpect = expected.defaultExpect
-    const testenv2Expect = expected.testenv2Expect
+    const defaultExpect = expected.defaultExpect as any
+    const testenv2Expect = expected.testenv2Expect as any
 
     // Check if the shell is available
     before(function() {
@@ -38,9 +34,9 @@ describe('SMConfig test via shell', function() {
 
     it('Call the test script', function() {
         this.slow(1000)
-        
+
         return execPromise('node test/resources/test-script.js')
-            .then((result) => {
+            .then((result: any) => {
                 assert.ok(result.stdout)
                 const obj = JSON.parse(result.stdout)
                 assert.deepStrictEqual(obj, defaultExpect)
@@ -55,7 +51,7 @@ describe('SMConfig test via shell', function() {
             'node test/resources/test-script.js'
         ].join(' ')
         return execPromise(command)
-            .then((result) => {
+            .then((result: any) => {
                 assert.ok(result.stdout)
                 const obj = JSON.parse(result.stdout)
                 assert.deepStrictEqual(obj, testenv2Expect)
@@ -74,7 +70,7 @@ describe('SMConfig test via shell', function() {
             'node test/resources/test-script.js'
         ].join(' ')
         return execPromise(command)
-            .then((result) => {
+            .then((result: any) => {
                 assert.ok(result.stdout)
                 const obj = JSON.parse(result.stdout)
                 assert.deepStrictEqual(obj, expect)
@@ -95,7 +91,7 @@ describe('SMConfig test via shell', function() {
             'node test/resources/test-script.js'
         ].join(' ')
         return execPromise(command)
-            .then((result) => {
+            .then((result: any) => {
                 assert.ok(result.stdout)
                 const obj = JSON.parse(result.stdout)
                 assert.deepStrictEqual(obj, expect)
@@ -117,7 +113,7 @@ describe('SMConfig test via shell', function() {
             'node test/resources/test-script.js'
         ].join(' ')
         return execPromise(command)
-            .then((result) => {
+            .then((result: any) => {
                 assert.ok(result.stdout)
                 const obj = JSON.parse(result.stdout)
                 assert.deepStrictEqual(obj, expect)
@@ -138,7 +134,7 @@ describe('SMConfig test via shell', function() {
             'node test/resources/test-script.js'
         ].join(' ')
         return execPromise(command)
-            .then((result) => {
+            .then((result: any) => {
                 assert.ok(result.stdout)
                 const obj = JSON.parse(result.stdout)
                 assert.deepStrictEqual(obj, expect)

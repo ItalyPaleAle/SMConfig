@@ -1,14 +1,10 @@
-/*eslint-env mocha */
+import 'mocha'
+import assert from 'assert'
+import {ParseEnvVar} from '../src/ParseEnvVar'
 
-'use strict'
-
-require('should')
-const assert = require('assert')
-const parseEnvVar = require('../lib/parseEnvVar')
-
-describe('parseEnvVar', function() {
+describe('ParseEnvVar', function() {
     it('Single key-value pair', function() {
-        const test = parseEnvVar('key=value')
+        const test = ParseEnvVar('key=value')
         const expect = {
             key: 'value'
         }
@@ -16,7 +12,7 @@ describe('parseEnvVar', function() {
     })
 
     it('Single key-value pair (nested)', function() {
-        const test = parseEnvVar('key.a=value')
+        const test = ParseEnvVar('key.a=value')
         const expect = {
             key: {
                 a: 'value'
@@ -26,7 +22,7 @@ describe('parseEnvVar', function() {
     })
 
     it('Multiple key-value pairs', function() {
-        const test = parseEnvVar('key=value hello=world')
+        const test = ParseEnvVar('key=value hello=world')
         const expect = {
             key: 'value',
             hello: 'world'
@@ -35,7 +31,7 @@ describe('parseEnvVar', function() {
     })
 
     it('Multiple key-value pairs (nested)', function() {
-        const test = parseEnvVar('key.a=value hello=world help.me=yes')
+        const test = ParseEnvVar('key.a=value hello=world help.me=yes')
         const expect = {
             key: {
                 a: 'value'
@@ -49,7 +45,7 @@ describe('parseEnvVar', function() {
     })
 
     it('Ending with whitespace characters', function() {
-        const test = parseEnvVar('key.a=value hello=world help.me=yes\n \t')
+        const test = ParseEnvVar('key.a=value hello=world help.me=yes\n \t')
         const expect = {
             key: {
                 a: 'value'
@@ -63,7 +59,7 @@ describe('parseEnvVar', function() {
     })
 
     it('Numeric values', function() {
-        const test = parseEnvVar('key=value intNumber=8 negative=-12 float=-12.3')
+        const test = ParseEnvVar('key=value intNumber=8 negative=-12 float=-12.3')
         const expect = {
             key: 'value',
             intNumber: 8,
@@ -77,35 +73,35 @@ describe('parseEnvVar', function() {
         let test, expect
 
         // Double quote
-        test = parseEnvVar('key="value"')
+        test = ParseEnvVar('key="value"')
         expect = {
             key: 'value'
         }
         assert.deepStrictEqual(test, expect)
 
         // Single quote
-        test = parseEnvVar('key=\'value\'')
+        test = ParseEnvVar('key=\'value\'')
         expect = {
             key: 'value'
         }
         assert.deepStrictEqual(test, expect)
 
         // Space inside value
-        test = parseEnvVar('key="hello world"')
+        test = ParseEnvVar('key="hello world"')
         expect = {
             key: 'hello world'
         }
         assert.deepStrictEqual(test, expect)
 
         // Same, with single quotes
-        test = parseEnvVar('key=\'hello world\'')
+        test = ParseEnvVar('key=\'hello world\'')
         expect = {
             key: 'hello world'
         }
         assert.deepStrictEqual(test, expect)
 
         // Multiple values
-        test = parseEnvVar('key=\'hello world\' name="Leonardo Da Vinci"')
+        test = ParseEnvVar('key=\'hello world\' name="Leonardo Da Vinci"')
         expect = {
             key: 'hello world',
             name: 'Leonardo Da Vinci'
@@ -113,7 +109,7 @@ describe('parseEnvVar', function() {
         assert.deepStrictEqual(test, expect)
 
         // Using \ not as escape character
-        test = parseEnvVar('key=\'hello \\ world\' name="Leonardo \\\' Da Vinci"')
+        test = ParseEnvVar('key=\'hello \\ world\' name="Leonardo \\\' Da Vinci"')
         expect = {
             key: 'hello \\ world',
             name: 'Leonardo \\\' Da Vinci'
@@ -125,35 +121,35 @@ describe('parseEnvVar', function() {
         let test, expect
 
         // Double quote
-        test = parseEnvVar('"key"="value"')
+        test = ParseEnvVar('"key"="value"')
         expect = {
             key: 'value'
         }
         assert.deepStrictEqual(test, expect)
 
         // Single quote
-        test = parseEnvVar('\'key\'=\'value\'')
+        test = ParseEnvVar('\'key\'=\'value\'')
         expect = {
             key: 'value'
         }
         assert.deepStrictEqual(test, expect)
 
         // = inside key name
-        test = parseEnvVar('"k=ey"="hello world"')
+        test = ParseEnvVar('"k=ey"="hello world"')
         expect = {
             'k=ey': 'hello world'
         }
         assert.deepStrictEqual(test, expect)
 
         // Same, with single quotes
-        test = parseEnvVar('\'k=ey\'=\'hello world\'')
+        test = ParseEnvVar('\'k=ey\'=\'hello world\'')
         expect = {
             'k=ey': 'hello world'
         }
         assert.deepStrictEqual(test, expect)
 
         // Multiple values
-        test = parseEnvVar('"k=ey"=\'hello world\' "name="="Leonardo Da Vinci"')
+        test = ParseEnvVar('"k=ey"=\'hello world\' "name="="Leonardo Da Vinci"')
         expect = {
             'k=ey': 'hello world',
             'name=': 'Leonardo Da Vinci'
@@ -165,7 +161,7 @@ describe('parseEnvVar', function() {
         let test, expect
 
         // Escape outside of a quoted block
-        test = parseEnvVar('key=\\\'value key2=\\"value key3=\\\\value')
+        test = ParseEnvVar('key=\\\'value key2=\\"value key3=\\\\value')
         expect = {
             key: '\'value',
             key2: '"value',
@@ -174,14 +170,14 @@ describe('parseEnvVar', function() {
         assert.deepStrictEqual(test, expect)
 
         // Escape inside a quoted block - single quotes
-        test = parseEnvVar('key=\'un po\\\' di zucchero\'')
+        test = ParseEnvVar('key=\'un po\\\' di zucchero\'')
         expect = {
             key: 'un po\' di zucchero'
         }
         assert.deepStrictEqual(test, expect)
 
         // Escape inside a quoted block - double quotes
-        test = parseEnvVar('key="un po\' di \\"zucchero\\""')
+        test = ParseEnvVar('key="un po\' di \\"zucchero\\""')
         expect = {
             key: 'un po\' di "zucchero"'
         }
@@ -192,7 +188,7 @@ describe('parseEnvVar', function() {
         let test, expect
 
         // Multiple spaces
-        test = parseEnvVar('"k=ey"=\'hello world\'    "name="="Leonardo Da Vinci"')
+        test = ParseEnvVar('"k=ey"=\'hello world\'    "name="="Leonardo Da Vinci"')
         expect = {
             'k=ey': 'hello world',
             'name=': 'Leonardo Da Vinci'
@@ -200,7 +196,7 @@ describe('parseEnvVar', function() {
         assert.deepStrictEqual(test, expect)
 
         // Other spacing characters
-        test = parseEnvVar('"k=ey"=\'hello world\'\n   "name="="Leonardo Da Vinci"')
+        test = ParseEnvVar('"k=ey"=\'hello world\'\n   "name="="Leonardo Da Vinci"')
         expect = {
             'k=ey': 'hello world',
             'name=': 'Leonardo Da Vinci'
@@ -208,7 +204,7 @@ describe('parseEnvVar', function() {
         assert.deepStrictEqual(test, expect)
 
         // Other spacing characters
-        test = parseEnvVar('"k=ey"=\'hello world\'\n\t\t"name="="Leonardo Da Vinci"\r\na=12.3')
+        test = ParseEnvVar('"k=ey"=\'hello world\'\n\t\t"name="="Leonardo Da Vinci"\r\na=12.3')
         expect = {
             'k=ey': 'hello world',
             'name=': 'Leonardo Da Vinci',
@@ -220,22 +216,22 @@ describe('parseEnvVar', function() {
     it('Invalid syntax', function() {
         // Key without value
         assert.throws(() => {
-            parseEnvVar('key')
+            ParseEnvVar('key')
         }, /Malformed string/)
 
         // Last key is without value
         assert.throws(() => {
-            parseEnvVar('a=b   key')
+            ParseEnvVar('a=b   key')
         }, /Malformed string/)
 
         // Closing quote missing
         assert.throws(() => {
-            parseEnvVar('a=b   key="a')
+            ParseEnvVar('a=b   key="a')
         }, /Malformed string/)
 
         // Closing quote missing
         assert.throws(() => {
-            parseEnvVar('a=\'b   key="a')
+            ParseEnvVar('a=\'b   key="a')
         }, /Malformed string/)
     })
 })

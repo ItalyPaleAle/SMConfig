@@ -1,18 +1,38 @@
-'use strict'
+import fs from 'fs'
+import lodashCloneDeep from 'lodash/clonedeep'
+import lodashMerge from 'lodash/merge'
+import SMHelper from 'smhelper'
+import {GetEnvironment} from './GetEnvironment'
+import {LoadConfigFile} from './LoadConfigFile'
+import {ParseEnvVar} from './ParseEnvVar'
+import {ConfigStore, Dictionary} from './SharedTypes'
 
-const lodashMerge = require('lodash.merge')
-const lodashCloneDeep = require('lodash.clonedeep')
-const SMHelper = require('smhelper')
-const fs = require('fs')
+/**
+ * Type for the `config` argument of the SMConfig constructor
+ */
+export type SMConfigConfig = Array<Dictionary|string|SMConfig>|Dictionary|string|SMConfig
 
-const parseEnvVar = require('./lib/parseEnvVar')
-const loadConfigFile = require('./lib/loadConfigFile')
-const getEnvironment = require('./lib/getEnvironment')
+/**
+ * Options for the SMConfig constructor
+ */
+export interface SMConfigOptions {
+    /** Name of the environmental variable with options passed at runtime; default is `SMCONFIG` */
+    envVarName?: string
+}
 
 /**
  * Environment and configuration utilities
  */
-class SMConfig {
+export class SMConfig {
+    /** Holds the name of the environment, as determined during initialization */
+    protected _environment: string
+
+    /** Contains the configuration for the current environment */
+    protected _config: Dictionary
+
+    /** Contains the configuration for the current environment, flattened in the "dot notation", so it's easier to access */
+    protected _flatConfig: Dictionary
+
     /**
      * Initializes the class, determining the environment, then
      * loading the configuration for the environment and storing it in the object.
@@ -89,19 +109,17 @@ class SMConfig {
      * parsed using `SMHelper.strIs`, so the `*` token can be used as wildcard.
      *
      * The environment is determined by, in order:
-     * 
+     *
      * 1. The value passed to the **`env`** parameter
      * 2. The `NODE_ENV` environmental variable
      * 3. The environment that is configured for the hostname
      * 4. Fallback to the `default` environment
-     * 
-     * @param {(Array<Object, string, SMConfig>|Object|string|SMConfig)} config - Configuration params or filename(s) to load
-     * @param {string} [env=default] - Force a specific environment
-     * @param {Object} [options] - Advanced options dictionary
-     * @param {string} [options.envVarName=SMCONFIG] - Name of the environmental
-     *        variable with options passed at runtime.
+     *
+     * @param config - Configuration params or filename(s) to load
+     * @param env - Force a specific environment
+     * @param options - Dictionary with options
      */
-    constructor(config, env, options) {
+    constructor(config: SMConfigConfig, env?: string, options?: SMConfigOptions) {
         // Ensure options is an object
         if (options && !SMHelper.isPlainObject(options)) {
             throw Error('The options parameter must be a dictionary')
@@ -126,11 +144,11 @@ class SMConfig {
         }
 
         // Iterate through the config object and load all data
-        const configData = {}
+        const configData = {} as ConfigStore
         for (const i in config) {
             // String - represents a file to load
             if (typeof config[i] == 'string') {
-                lodashMerge(configData, loadConfigFile(config[i]))
+                lodashMerge(configData, LoadConfigFile(config[i]))
             }
             // Another instance of SMConfig
             else if (config[i] instanceof SMConfig) {
@@ -146,7 +164,7 @@ class SMConfig {
             }
             else {
                 throw Error('Parameter config must be a string, a plain object, or an array of the strings and objects')
-            }    
+            }
         }
 
         // Ensure configData contains the default configuration
@@ -161,7 +179,7 @@ class SMConfig {
         options.envVarName = SMHelper.toStringSafe(options.envVarName)
 
         // Get the name of the current environment
-        this._environment = getEnvironment(env, configData.hostnames)
+        this._environment = GetEnvironment(env, configData.hostnames)
 
         // Load environmental-specific configuration
         const envConfig = (configData[this.environment] && SMHelper.isPlainObject(configData[this.environment]))
@@ -169,7 +187,7 @@ class SMConfig {
             : {}
 
         // Lastly, load configuration from environmental variables
-        let envVars = {}
+        let envVars = {} as Dictionary
         const matchExpression = new RegExp('^(' + options.envVarName + '|' + options.envVarName + '_[0-9]+)$')
         /* istanbul ignore else */
         if (process && process.env) {
@@ -184,11 +202,11 @@ class SMConfig {
                     if (!fileContent) {
                         throw Error('Cannot read file with environment variables: file is empty')
                     }
-                    envVars = lodashMerge(envVars, parseEnvVar(fileContent))
+                    envVars = lodashMerge(envVars, ParseEnvVar(fileContent))
                 }
                 // Check if it's a string SMCONFIG or SMCONFIG_n
                 else if (key.match(matchExpression)) {
-                    envVars = lodashMerge(envVars, parseEnvVar(process.env[key]))
+                    envVars = lodashMerge(envVars, ParseEnvVar(process.env[key]))
                 }
             }
         }
@@ -198,36 +216,34 @@ class SMConfig {
         // 2. Environment config
         // 3. Default config
         // Store the result in the object
-        this._config = lodashMerge({}, configData.default, envConfig, envVars)
+        this._config = lodashMerge({} as Dictionary, configData.default, envConfig, envVars)
 
-        // Store the flattened configuration to "dot notation", 
+        // Store the flattened configuration to "dot notation",
         // so we can access nested properties with config.get()
         this._flatConfig = SMHelper.objectToDotNotation(this._config, true)
     }
 
     /**
      * Environment name
-     * @type {string}
      */
-    get environment() {
+    get environment(): string {
         return this._environment
     }
 
     /**
      * All configuration parameters (read-only)
-     * @type {Object}
      */
-    get all() {
+    get all(): Dictionary {
         // Return a clone of the object so it can't be modified
         return lodashCloneDeep(this._config)
     }
 
     /**
      * Return value for key from configuration
-     * @param {string} key - Configuration key to retrieve
-     * @return {*} Value for the key
+     * @param key - Configuration key to retrieve
+     * @return Value for the key
      */
-    get(key) {
+    get(key: string): any {
         if (!key || typeof key != 'string') {
             throw Error('Parameter key must be a non-empty string')
         }
@@ -244,5 +260,5 @@ class SMConfig {
         return lodashCloneDeep(val)
     }
 }
-
 module.exports = SMConfig
+export default SMConfig

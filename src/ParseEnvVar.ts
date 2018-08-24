@@ -1,10 +1,17 @@
-'use strict'
+import SMHelper from 'smhelper'
+import {Dictionary} from './SharedTypes'
 
-/**
- * @module parseEnvVar
- */
+/* tslint:disable:no-bitwise */
 
-const SMHelper = require('smhelper')
+// Function used to parse numeric values
+function parseToken(token) {
+    // Check if value is a numeric string, then convert to number (float)
+    if (SMHelper.isNumeric(token)) {
+        token = parseFloat(token)
+    }
+
+    return token
+}
 
 /**
  * Load additional configuration from environmental variables.
@@ -13,21 +20,11 @@ const SMHelper = require('smhelper')
  * If necessary, single and/or double quotes can be used to escape the key or
  * the value.
  * Nested properties can be set using the "dot notation", as in `obj.a`.
- * 
- * @param {string} str - Content of the environmental variable to parse
- * @return {Object} Dictionary with the configuration parsed.
+ *
+ * @param str - Content of the environmental variable to parse
+ * @return Dictionary with the configuration parsed.
  */
-function parseEnvVar(str) {
-    // Function used to parse numeric values
-    const parseToken = (token) => {
-        // Check if value is a numeric string, then convert to number (float)
-        if (SMHelper.isNumeric(token)) {
-            token = parseFloat(token)
-        }
-
-        return token
-    }
-
+export function ParseEnvVar(str: string): Dictionary {
     // Returns true if the character is a spacing one
     // Grabbed from \s from regular expressions
     // Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
@@ -37,7 +34,7 @@ function parseEnvVar(str) {
     }
 
     // Parse the string passed as environmental variable
-    const result = {}
+    const result = {} as Dictionary
     let mode = 0 // 0 = key, 1 = value, &2 = single quote, &4 = double quote
     let token = ''
     let key = ''
@@ -97,7 +94,7 @@ function parseEnvVar(str) {
             mode = 0
 
             // If the next characters are spacing ones too, skip them
-            while (isSpacing(str[i+1])) {
+            while (isSpacing(str[i + 1])) {
                 i++
             }
         }
@@ -120,5 +117,3 @@ function parseEnvVar(str) {
 
     return result
 }
-
-module.exports = parseEnvVar

@@ -1,8 +1,10 @@
 .travis.yml
 .eslintignore
 .eslintrc.yml
-.jsdoc.json  
+.vscode
 docs
 test
 coverage
-smconfig*.tgz
+src
+tsconfig.json
+tslint.json

@@ -1,17 +1,14 @@
-/*eslint-env mocha */
+import 'mocha'
+import 'should'
+import assert from 'assert'
+import os from 'os'
+import SMConfig from '../src/SMConfig'
+import SMHelper from 'smhelper'
+import lodashCloneDeep from 'lodash/clonedeep'
 
-'use strict'
+import expected = require('./resources/expected')
 
-require('should')
-const assert = require('assert')
-const os = require('os')
-const SMConfig = require('../index')
-const SMHelper = require('smhelper')
-const lodashCloneDeep = require('lodash.clonedeep')
-
-const expected = require('./resources/expected')
-
-describe('SMConfig.js', function() {
+describe('SMConfig', function() {
 
     it('SMConfig should export a class', function() {
         SMConfig.should.be.type('function')
@@ -28,11 +25,11 @@ describe('SMConfig.js', function() {
     describe('Constructor method', function() {
         let originalEnv
 
-        const params = expected.params
-        const defaultExpect = expected.defaultExpect
-        const testenv1Expect = expected.testenv1Expect
-        const testenv2Expect = expected.testenv2Expect
-        const addendumExpect = expected.addendumExpect
+        const params = expected.params as any
+        const defaultExpect = expected.defaultExpect as any
+        const testenv1Expect = expected.testenv1Expect as any
+        const testenv2Expect = expected.testenv2Expect as any
+        const addendumExpect = expected.addendumExpect as any
 
         // Current machine's hostname
         const currentHostname = os.hostname()
@@ -50,7 +47,7 @@ describe('SMConfig.js', function() {
         it('Configuration object', function() {
             // Parameter config not present
             assert.throws(() => {
-                new SMConfig()
+                new (SMConfig as any)()
             }, /must be set/i)
 
             // Parameter config not a string neither an object
@@ -76,7 +73,7 @@ describe('SMConfig.js', function() {
         it('Options parameter', function() {
             // Options parameter is not a dictionary
             assert.throws(() => {
-                new SMConfig({default: {}}, 'default', 'invalid')
+                new SMConfig({default: {}}, 'default', 'invalid' as any)
             })
         })
 
@@ -310,7 +307,7 @@ describe('SMConfig.js', function() {
             // Cleanup
             delete process.env.SMCONFIG_FILE
         })
-        
+
         it('Configuration: env var file does not exist', function() {
             process.env.SMCONFIG_FILE = 'test/_notfound'
 
@@ -343,7 +340,7 @@ describe('SMConfig.js', function() {
             // Cleanup
             delete process.env.SMCONFIG_FILE
         })
-        
+
         it('Configuration: overwrite at runtime with environmental variables (invalid var name)', function() {
             assert.throws(() => {
                 new SMConfig(params, 'default', {envVarName: ''})
@@ -446,7 +443,7 @@ describe('SMConfig.js', function() {
         it('SMConfig.environment should be read-only', function() {
             const config = new SMConfig({default: {}}, 'myenv')
             assert.throws(() => {
-                config.environment = 'newenv'
+                (config as any).environment = 'newenv'
             }, /TypeError/)
         })
 
@@ -459,11 +456,12 @@ describe('SMConfig.js', function() {
         it('SMConfig.all should be read-only', function() {
             const config = new SMConfig({default: {}}, 'myenv')
             assert.throws(() => {
-                config.all = {hello: 'world'}
+                (config as any).all = {hello: 'world'}
             }, /TypeError/)
         })
 
         it('SMConfig.all should return a cloned object', function() {
+            // Use another name for env vars so the env vars set before are ignored
             const config = new SMConfig({default: {a: 1, obj: {x: 1, y: 2}}, myenv: {b: 2}}, 'myenv', {envVarName: 'NOTHINGHERE'})
 
             // The returned object should be a clone, so editing a value in it shouldn't change the value in the SMConfig instance
@@ -476,21 +474,21 @@ describe('SMConfig.js', function() {
         })
 
         it('SMConfig.get should return value for configuration key', function() {
-            // Use another prefix for env vars so the ones set before are ignored
-            const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar']}}, 'myenv', {envVarPrefix: 'NOTHING_'})
+            // Use another name for env vars so the env vars set before are ignored
+            const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar']}}, 'myenv', {envVarName: 'NOTHINGHERE'})
             assert.deepStrictEqual(config.get('a'), 1)
             assert.deepStrictEqual(config.get('b'), 'ale')
             assert.deepStrictEqual(config.get('foo'), ['bar'])
 
             // Passing a key that is not a string should throw an exception
             assert.throws(() => {
-                config.get(12)
+                config.get(12 as any)
             }, /non-empty string/i)
         })
 
         it('SMConfig.get should return a cloned object', function() {
-            // Use another prefix for env vars so the ones set before are ignored
-            const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar'],  obj: {x: 1, y: 2}}}, 'myenv', {envVarPrefix: 'NOTHING_'})
+            // Use another name for env vars so the env vars set before are ignored
+            const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar'],  obj: {x: 1, y: 2}}}, 'myenv', {envVarName: 'NOTHING_'})
             const obj = config.get('obj')
             assert.deepStrictEqual(obj,  {x: 1, y: 2})
             obj.x = -10
@@ -498,5 +496,5 @@ describe('SMConfig.js', function() {
             assert.deepStrictEqual(config.get('obj'),  {x: 1, y: 2})
         })
     })
-    
+
 })
