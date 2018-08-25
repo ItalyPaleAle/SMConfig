@@ -9,7 +9,7 @@
   "scripts": {
     "test-travis": "TZ=Etc/UTC npm run tsc && ./node_modules/.bin/ts-node node_modules/istanbul/lib/cli.js cover -e .ts  -x \"*.d.ts\" -x \"*.test.ts\" ./node_modules/.bin/_mocha -- -R test test/**/*.test.ts && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "compile": "npm run tsc",
-    "docs": "npm run typedoc",
+    "docs": "npm run typedoc && cp .nojekyll docs/.nojekyll",
     "tsc": "./node_modules/.bin/tsc",
     "test": "TZ=Etc/UTC npm run tsc && ./node_modules/.bin/ts-node node_modules/istanbul/lib/cli.js cover -e .ts  -x \"*.d.ts\" -x \"*.test.ts\" ./node_modules/.bin/_mocha --report html -- -R test test/**/*.test.ts",
     "test-nocov": "TZ=Etc/UTC npm run tsc && ./node_modules/.bin/_mocha -r ts-node/register test/**/*.test.ts",
