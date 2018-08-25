@@ -1,4 +1,4 @@
-# SMConfig v2.0
+# SMConfig v2.1
 
 [![Build Status](https://travis-ci.org/ItalyPaleAle/SMConfig.svg?branch=master)](https://travis-ci.org/ItalyPaleAle/SMConfig)
 [![Coverage Status](https://coveralls.io/repos/github/ItalyPaleAle/SMConfig/badge.svg?branch=master)](https://coveralls.io/github/ItalyPaleAle/SMConfig?branch=master)
