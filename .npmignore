@@ -2,6 +2,7 @@
 .eslintignore
 .eslintrc.yml
 .vscode
+.nojekyll
 docs
 test
 coverage
