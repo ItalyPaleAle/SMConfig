@@ -10,13 +10,13 @@
   "scripts": {
     "test-travis": "TZ=Etc/UTC npm run tsc && ./node_modules/.bin/ts-node ./node_modules/.bin/istanbul cover -e .ts  -x \"*.d.ts\" -x \"*.test.ts\" ./node_modules/.bin/_mocha -- -R test test/**/*.test.ts && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage",
     "compile": "npm run tsc",
-    "docs": "npm run typedoc && cp .nojekyll docs/.nojekyll",
+    "docs": "npm run typedoc",
     "tsc": "./node_modules/.bin/tsc",
     "test": "TZ=Etc/UTC npm run tsc && ./node_modules/.bin/ts-node ./node_modules/.bin/istanbul cover -e .ts  -x \"*.d.ts\" -x \"*.test.ts\" ./node_modules/.bin/_mocha --report html -- -R test test/**/*.test.ts",
     "test-nocov": "TZ=Etc/UTC npm run tsc && ./node_modules/.bin/_mocha -r ts-node/register test test/**/*.test.ts",
     "lint": "npm run tslint",
     "tslint": "./node_modules/.bin/tslint -p tsconfig.json",
-    "typedoc": "./node_modules/.bin/typedoc --name SMClean --out docs/ --readme README.md --target ES6 --module commonjs --mode modules src",
+    "typedoc": "./node_modules/.bin/typedoc --name SMClean --out docs/ --readme README.md --target ES6 --module commonjs --mode modules src && touch docs/.nojekyll",
     "prepublishOnly": "npm run tslint && npm run compile && npm run test"
   },
   "repository": {
