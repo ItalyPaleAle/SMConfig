@@ -4,7 +4,7 @@ import assert from 'assert'
 import os from 'os'
 import SMConfig from '../src/SMConfig'
 import SMHelper from 'smhelper'
-import lodashCloneDeep from 'lodash/clonedeep'
+import lodashCloneDeep from 'lodash/cloneDeep'
 
 import expected = require('./resources/expected')
 
