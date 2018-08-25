@@ -1,5 +1,5 @@
 import fs from 'fs'
-import lodashCloneDeep from 'lodash/clonedeep'
+import lodashCloneDeep from 'lodash/cloneDeep'
 import lodashMerge from 'lodash/merge'
 import SMHelper from 'smhelper'
 import {GetEnvironment} from './GetEnvironment'
