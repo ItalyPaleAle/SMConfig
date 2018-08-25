@@ -52,7 +52,7 @@ describe('SMConfig', function() {
 
             // Parameter config not a string neither an object
             assert.throws(() => {
-                new SMConfig(12)
+                new SMConfig(12 as any)
             }, /parameter config must be/i)
 
             // Missing config.default
