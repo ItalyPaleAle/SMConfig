@@ -3,6 +3,7 @@
   "version": "2.0.2",
   "description": "Application configuration module for Node.js",
   "main": "dist/SMConfig.js",
+  "types": "dist/SMConfig.d.js",
   "directories": {
     "test": "test"
   },
