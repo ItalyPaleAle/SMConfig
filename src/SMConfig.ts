@@ -245,13 +245,7 @@ export class SMConfig {
 
         // If key contains a dot, we are requesting a nested object
         if (key.indexOf('.') != -1) {
-            const parts = key.split('.')
-            val = this._config
-            let i = 0
-            while (val && i < parts.length) {
-                val = val[parts[i]]
-                i++
-            }
+            val = SMHelper.getDescendantProperty(this._config, key)
         }
         else {
             val = this._config[key]
