@@ -30,9 +30,6 @@ export class SMConfig {
     /** Contains the configuration for the current environment */
     protected _config: Dictionary
 
-    /** Contains the configuration for the current environment, flattened in the "dot notation", so it's easier to access */
-    protected _flatConfig: Dictionary
-
     /**
      * Initializes the class, determining the environment, then
      * loading the configuration for the environment and storing it in the object.
@@ -217,10 +214,6 @@ export class SMConfig {
         // 3. Default config
         // Store the result in the object
         this._config = lodashMerge({} as Dictionary, configData.default, envConfig, envVars)
-
-        // Store the flattened configuration to "dot notation",
-        // so we can access nested properties with config.get()
-        this._flatConfig = SMHelper.objectToDotNotation(this._config, true)
     }
 
     /**
@@ -248,11 +241,19 @@ export class SMConfig {
             throw Error('Parameter key must be a non-empty string')
         }
 
-        // Check if we have it in the flatConfig dictionary first,
-        // to access nested properties
-        let val = this._flatConfig[key]
-        if (val === undefined) {
-            // Check the non-flattened dictionary
+        let val
+
+        // If key contains a dot, we are requesting a nested object
+        if (key.indexOf('.') != -1) {
+            const parts = key.split('.')
+            val = this._config
+            let i = 0
+            while (val && i < parts.length) {
+                val = val[parts[i]]
+                i++
+            }
+        }
+        else {
             val = this._config[key]
         }
 

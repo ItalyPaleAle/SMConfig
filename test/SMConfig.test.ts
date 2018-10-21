@@ -478,10 +478,18 @@ describe('SMConfig', function() {
 
         it('SMConfig.get should return value for configuration key', function() {
             // Use another name for env vars so the env vars set before are ignored
-            const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar']}}, 'myenv', {envVarName: 'NOTHINGHERE'})
+            const config = new SMConfig({default: {a: 1}, myenv: {b: 'ale', foo: ['bar'], obj: {nested1: {nested2: [0, 1]}}}}, 'myenv', {envVarName: 'NOTHINGHERE'})
             assert.deepStrictEqual(config.get('a'), 1)
             assert.deepStrictEqual(config.get('b'), 'ale')
             assert.deepStrictEqual(config.get('foo'), ['bar'])
+
+            // Nested objects
+            assert.deepStrictEqual(config.get('obj'), {nested1: {nested2: [0, 1]}})
+            assert.deepStrictEqual(config.get('obj.nested1'), {nested2: [0, 1]})
+            assert.deepStrictEqual(config.get('obj.nested1.nested2'), [0, 1])
+
+            // Not found
+            assert.strictEqual(config.get('notfound'), undefined)
 
             // Passing a key that is not a string should throw an exception
             assert.throws(() => {
