@@ -1,6 +1,12 @@
 {
   "default": {
-    "fruit": "pear"
+    "fruit": "pear",
+    "favorite": {
+      "colors": [
+        "blue",
+        "black"
+      ]
+    }
   },
   "addendum": {
     "fruit": "apricot"

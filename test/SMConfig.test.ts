@@ -424,6 +424,9 @@ describe('SMConfig', function() {
             const config3 = new SMConfig(['test/resources/addendum.json', config2], null, {envVarName: 'NOTHINGHERE'})
             const expect = SMHelper.cloneObject(testenv2Expect)
             expect.fruit = 'pear'
+            expect.favorite = {
+                colors: ['blue', 'black']
+            }
             assert.deepStrictEqual(config3.all, expect)
 
             // Same as above, but with environment

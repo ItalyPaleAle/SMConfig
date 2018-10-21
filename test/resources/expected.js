@@ -82,7 +82,10 @@ const addendumExpect = {
         x: 1,
         y: 2
     },
-    fruit: 'pear'
+    fruit: 'pear',
+    favorite: {
+        colors: ['blue', 'black']
+    }
 }
 
 module.exports = {
