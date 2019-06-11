@@ -3,6 +3,7 @@
 .eslintrc.yml
 .vscode
 .nojekyll
+.nyc_output
 docs
 test
 coverage
