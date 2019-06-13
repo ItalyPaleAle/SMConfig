@@ -8,11 +8,11 @@
     "test": "test"
   },
   "scripts": {
-    "test-travis": "npm run compile && npm run test && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage",
     "compile": "npm run tsc",
     "docs": "npm run typedoc",
     "tsc": "./node_modules/.bin/tsc",
     "test": "TZ=Etc/UTC ./node_modules/.bin/nyc ./node_modules/.bin/_mocha test/**/*.test.ts",
+    "test-ci": "TZ=Etc/UTC ./node_modules/.bin/nyc --reporter cobertura --reporter html ./node_modules/.bin/_mocha --reporter mocha-junit-reporter test/**/*.test.ts",
     "test-nocov": "TZ=Etc/UTC ./node_modules/.bin/_mocha -r ts-node/register test/**/*.test.ts",
     "lint": "npm run tslint",
     "tslint": "./node_modules/.bin/tslint -p tsconfig.json",
@@ -50,6 +50,7 @@
     "@types/validator": "^10.11.1",
     "coveralls": "^3.0.4",
     "mocha": "^6.1.4",
+    "mocha-junit-reporter": "^1.23.0",
     "nyc": "^14.1.1",
     "should": "^13.2.3",
     "ts-node": "^8.2.0",

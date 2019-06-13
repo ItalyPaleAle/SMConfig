@@ -1,0 +1,49 @@
+# Test app
+
+trigger:
+- master
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+strategy:
+  matrix:
+    node_8_x:
+      node_version: 8.x
+    node_10_x:
+      node_version: 10.x
+    node_11_x:
+      node_version: 11.x
+    node_12_x:
+      node_version: 12.x
+
+steps:
+
+- task: NodeTool@0
+  inputs:
+    versionSpec: $(node_version)
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+  displayName: 'Install NPM modules'
+
+- script: |
+    npm run tsc
+  displayName: 'Compile TypeScript'
+
+- script: |
+    npm run test-ci
+  displayName: 'Run tests'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/test-results.xml'
+
+- task: PublishCodeCoverageResults@1
+  inputs: 
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/coverage'
