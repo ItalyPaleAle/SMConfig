@@ -1,6 +1,6 @@
 {
   "name": "smconfig",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Application configuration module for Node.js",
   "main": "dist/SMConfig.js",
   "types": "dist/SMConfig.d.js",
