@@ -1,6 +1,9 @@
 ### TypeScript ###
 dist
 
+# Test results
+test-results.xml
+
 # This is a module published on NPM, so we can ignore package-lock.json
 package-lock.json
 
