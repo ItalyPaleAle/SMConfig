@@ -1,6 +1,6 @@
 # SMConfig v2.1
 
-[![Build Status](https://travis-ci.org/ItalyPaleAle/SMConfig.svg?branch=master)](https://travis-ci.org/ItalyPaleAle/SMConfig)
+[![Build Status](https://dev.azure.com/italypaleale/italypaleale/_apis/build/status/ItalyPaleAle.SMConfig?branchName=master)](https://dev.azure.com/italypaleale/italypaleale/_build/latest?definitionId=18&branchName=master)
 [![Coverage Status](https://coveralls.io/repos/github/ItalyPaleAle/SMConfig/badge.svg?branch=master)](https://coveralls.io/github/ItalyPaleAle/SMConfig?branch=master)
 [![Dependency Status](https://david-dm.org/ItalyPaleAle/SMConfig.svg?style=flat)](https://david-dm.org/ItalyPaleAle/SMConfig)
 [![devDependency Status](https://david-dm.org/ItalyPaleAle/SMConfig/dev-status.svg?style=flat)](https://david-dm.org/ItalyPaleAle/SMConfig#info=devDependencies)
